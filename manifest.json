@@ -132,10 +132,15 @@
                     }
                 }
             }
+        },
+        "router" : {
+            "mode" : "hash",
+            "base" : "./"
         }
-        // "router" : {
-        //     "mode" : "hash",
-        //     "base" : "./"
-        // }
     }
 }
+// "router" : {
+//     "mode" : "hash",
+//     "base" : "./"
+// }
+

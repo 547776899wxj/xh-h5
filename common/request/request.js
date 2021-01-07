@@ -1,8 +1,8 @@
 export default class Http{
 	constructor(options) {
 		//跨域使用api 配置manifest proxy
-		let ip = '/api/';
-		// let ip = 'http://192.168.0.180:8082/';
+		// let ip = '/api/';
+		let ip = 'http://192.168.2.18:8081/';
 		// 参数
 		this.options = options;
 		// 请求参数

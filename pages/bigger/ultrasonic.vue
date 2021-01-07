@@ -1,68 +1,51 @@
 <template>
 	<view class="content"  @longpress="open" @click="open">
 		<image class="bg" src="../../static/ultrasonic.png" ></image>
-		<view class="title">{{iType}}</view>
+		<view class="title">{{title}}</view>
 		<view class="tip">温馨提示：各个诊室正在呼叫号码如下：</view>
 		<view class="info">
 			<view>
-				<view class="info-patient" v-for="(item,index) in data" :key="index">
+				<view class="info-patient" v-for="(item,index) in data.slice(0,5)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+					<view class="number">{{item.number || item.seeingName}}</view>
 				</view>
 			</view>
 			<view>
-				<view class="info-patient" v-for="(item,index) in data" :key="index">
+				<view class="info-patient" v-for="(item,index) in data.slice(5,10)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+					<view class="number">{{item.number || item.seeingName}}</view>
 				</view>
 			</view>
 			<view>
-				<view class="info-patient" v-for="(item,index) in data" :key="index">
+				<view class="info-patient" v-for="(item,index) in data.slice(10,15)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+					<view class="number">{{item.number || item.seeingName}}</view>
 				</view>
 			</view>
 		</view>
 		<view class=" info-patient">
 			<view class="room">已叫号码</view>
-			<view class="number">{{calledNumbera}}</view>
+			<!-- <view class="number">{{calledNumbera}}</view> -->
+			<view class="uni-notice">
+				<uni-notice-bar scrollable="true" single="true" :text="calledNumbera" color="#000"></uni-notice-bar>
+			</view>
 		</view>
 		<view class="footer">
-			友情提示：请在自助机刷卡取排队号，取号后在大厅等候广播呼叫，过号请与窗口联系！
+			<uni-notice-bar scrollable="true" single="true" :text="tips"></uni-notice-bar>
 		</view>
-		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showPlaySound="true" :showIType="true" ></popupSet>
+		<popupSet ref="popupSet" @confirm="confirm" @close="close" :showTitle="true" :showwText="true" :dataInit="dataPopup"  :showPlaySound="true" :showIType="true" ></popupSet>
 	</view>
 </template>
 
 <script>
 	import popupSet from '../../components/popup-set/popup-set.vue';
+	import uniNoticeBar from '@/components/uni-notice-bar/uni-notice-bar.vue'
 	export default {
-		components: { popupSet },
+		components: { popupSet ,uniNoticeBar},
 		data() {
 			return {
 				title:'超声科',
 				data:[
-					// {
-					// 	room:'诊室1',
-					// 	number:'GX124',
-					// },
-					// {
-					// 	room:'诊室1',
-					// 	number:'GX124',
-					// },
-					// {
-					// 	room:'诊室1',
-					// 	number:'GX124',
-					// },
-					// {
-					// 	room:'诊室1',
-					// 	number:'GX124',
-					// },
-					// {
-					// 	room:'诊室1',
-					// 	number:'GX124',
-					// },
-				
 				],
 				calledNumbera:'',
 				iType:'',
@@ -76,19 +59,32 @@
 					iType:'',
 					screenNumber:'',
 					playSound:false,
+					text:'',
 				},
 				voicePlayNumber:0,
+				voicePlayTiems:0,
+				text:'',
+				tips:'',
+				reload:false,
 			}
 		},
 		onLoad() {
-			this.iType = uni.getStorageSync('iType')||'';
-			this.screenNumber = uni.getStorageSync('screenNumber') || '';
-			this.playSound = uni.getStorageSync('playSound') || false;
+			let dataInit = uni.getStorageSync('dataInit')||{};
+			this.iType = dataInit.iType || '';
+			this.playSound = dataInit.playSound || false;
+			this.text = dataInit.text || '';
+			this.title = dataInit.title || '';
+			this.$tui.webView.postMessage({
+				data: {
+					reload:123
+				}
+			})
 			if(this.iType){
 				this.init();
 				this.dataPopup.iType = this.iType;
-				this.dataPopup.screenNumber = this.screenNumber;
-				this.dataPopup.playSound = this.playSound;
+				this.dataPopup.playSound = this.playSound ;
+				this.dataPopup.text = this.text;
+				this.dataPopup.title = this.title;
 			}
 		},
 		methods: {
@@ -107,9 +103,10 @@
 			//确定设置
 			confirm(res) {
 				this.iType = res.iType;
-				this.screenNumber = res.screenNumber;
 				this.playSound = res.playSound;
+				this.text = res.text;
 				this.popupShow = false;
+				this.title = res.title;
 				this.init();
 			},
 			// 初始化数据
@@ -118,81 +115,98 @@
 					return false;
 				}
 				// 测试使用
-				// let res = {data:{"Data":[
-				// {"ghhbid":null,"dept_code":null,"dept_name":"皮肤科","clinique_name":"皮肤1","clinique_code":"946","tech_title":null,"doctor":"王斗训","doctor_pic":null,"calling":null,"calling_seq":null,"calling_pre_time":null,"waiting":"郑杰","waiting_seq":"1","waiting_pre_time":null,"am_pm":"下午","status":"坐诊","dqjzbr":null,"dqjzxh":null},{"ghhbid":null,"dept_code":null,"dept_name":"皮肤科","clinique_name":"皮肤2","clinique_code":"947","tech_title":null,"doctor":"谢涵津","doctor_pic":null,"calling":"吴先杰","calling_seq":"53","calling_pre_time":null,"waiting":null,"waiting_seq":null,"waiting_pre_time":null,"am_pm":"下午","status":"坐诊","dqjzbr":null,"dqjzxh":null},{"ghhbid":null,"dept_code":null,"dept_name":"皮肤科","clinique_name":"皮肤3","clinique_code":"948","tech_title":null,"doctor":"林宝珍","doctor_pic":null,"calling":null,"calling_seq":null,"calling_pre_time":null,"waiting":"林榛苹","waiting_seq":"1","waiting_pre_time":null,"am_pm":"下午","status":"坐诊","dqjzbr":null,"dqjzxh":null}
-				// ],"ServiceTime":"2020-09-08 16:41:01"}}			
-				// res.data.Data[1].calling_seq =  res.data.Data[1].calling_seq +this.testNubmer++
-				
-				// uni.request({
-				//     url: 'http://129.1.20.21:8019/Queue/mmy_Get_Queue', 
-				// 	data:{
-				// 		dept_code :this.iType ,
-				// 		clinique_code :this.screenNumber ,
+				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	},
-				// 	timeout:3000,
-				//     success: (res) => {
-				// 		let datas = res.data.Data;
-				// 		let dataMaps = [];
-				// 		let voiceDataInit = [];
-				// 		datas.forEach((data,index) =>{
-				// 			let waitName =data.waiting?this.$util.hideName(data.waiting):'';
-				// 			let seeingName =data.calling?this.$util.hideName(data.calling):'';
-				// 			let dataMap = {
-				// 				room:data.clinique_name,
-				// 				doctor:data.doctor,
-				// 				code:data.dept_code,
-				// 				wait:{
-				// 					number:data.waiting_seq,
-				// 					name:waitName,
-				// 				},
-				// 				seeing:{
-				// 					number:data.calling_seq,
-				// 					name:seeingName,
-				// 				},
-				// 			}
-				// 			dataMaps = dataMaps.concat(dataMap);
-						
-				// 			if(seeingName && this.playSound){
-				// 				let number = this.$util.chineseNumeral(dataMap.seeing.number+'');
-				// 				let speakText = `请,${number}号,${data.calling}到,${dataMap.room}就诊`;
-				// 				if(this.data.length==0){
-				// 					this.voiceData.push(speakText);
-				// 					this.voiceDataInit.push(speakText);
-				// 				}else{
-				// 					voiceDataInit = voiceDataInit.concat(speakText);
-				// 				}
-				// 			}
-				// 		})
-				// 		this.data = dataMaps;
-				// 		if(this.playSound){
-				// 			if(voiceDataInit.length>0){
-				// 				this.voiceData = this.$util.findDifferentElements(voiceDataInit,this.voiceDataInit);
-				// 				this.voiceDataInit = voiceDataInit;
-				// 			}
-				// 			if(this.voiceData.length>0){
-				// 				this.voiceQueue();	
-				// 			}else{
-				// 				setTimeout(() => {
-				// 					this.init()
-				// 				}, 5000);
-				// 			}
-				// 		}else{
-				// 			setTimeout(() => {
-				// 				this.init();
-				// 			}, 5000);
-				// 		}		
-						
-				//     },
-				// 	fail:(res) => {
-				// 		uni.showToast({
-				// 			title:'请求失败',
-				// 			icon:'none'
-				// 		})
-				// 		setTimeout(() => {
-				// 			this.init()
-				// 		}, 5000);
-				// 	}
-				// });
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+					
+				// 	]}
+				this.$request({
+					url: 'Queue/getQueueForUsBig',
+					data:{
+						examClass: this.iType,
+						queueName: this.text,
+						apmFlag: '',
+					},
+					method: 'POST',
+					success: datas => {
+						try{
+							if(datas.reload=='true' || datas.reload==true){
+								this.$tui.webView.postMessage({
+									data: {
+										reload:datas.reload
+									}
+								})
+								return;
+							}
+							let calledNumbera = datas.CompleteList.map(item => {
+								return item.queueNo;
+							})
+							this.calledNumbera = calledNumbera.join();
+							this.tips = datas.scrolling;
+							let dataMaps = [];
+							let voiceDataInit = [];
+							datas.queueDtoList.forEach((data,index) =>{
+								if(!data.queueNo && this.data[index]){
+									data.queueNo = this.data[index].number;
+									data.name = this.data[index].seeingName;
+								}
+								let seeingName =data.name?this.$util.hideName(data.name):'';
+								let dataMap = {
+									room:data.queueName,
+									number:data.queueNo,
+									seeingName:seeingName,
+								}
+								dataMaps = dataMaps.concat(dataMap);
+								if(seeingName && this.playSound){
+									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
+									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									if(this.data.length==0){
+										this.voiceData.push(speakText);
+										this.voiceDataInit.push(speakText);
+									}else{
+										voiceDataInit = voiceDataInit.concat(speakText);
+									}
+								}
+							})
+							this.data = dataMaps;
+							if(this.playSound){
+								if(voiceDataInit.length>0){
+									this.voiceData = this.$util.findDifferentElements(voiceDataInit,this.voiceDataInit);
+									this.voiceDataInit = voiceDataInit;
+								}
+								if(this.voiceData.length>0){
+									this.voiceQueue();	
+								}else{
+									setTimeout(() => {
+										this.init()
+									}, 6000);
+								}
+							}else{
+								setTimeout(() => {
+									this.init();
+								}, 6000);
+							}
+						}
+						catch(err){
+							console.error(e);
+							setTimeout(() => {
+								this.init();
+							}, 6000);
+						}
+					},
+					fail: err => {
+						setTimeout(() => {
+							this.init();
+						}, 6000);
+					}
+				})
+				
 			},
 			// 语音队列
 			voiceQueue(){
@@ -208,7 +222,7 @@
 					this.voiceData = [];
 					setTimeout(() => {
 						this.init()
-					}, 5000);
+					}, 6000);
 				}
 			},
 			// 播放完执行
@@ -219,7 +233,7 @@
 				}
 				setTimeout(() => {
 					this.voicePlayNumber++;
-					if(this.voicePlayNumber>=2){
+					if(this.voicePlayNumber>=this.voicePlayTiems){
 						this.voiceData.shift();
 						this.voicePlayNumber = 0;
 					}
@@ -228,7 +242,7 @@
 					}else{
 						setTimeout(() => {
 							this.init()
-						}, 5000);
+						}, 6000);
 					}
 				}, date);
 				
@@ -257,9 +271,9 @@ page {
 .footer{
 	color: #FFFFFF;
     font-size: 44px;
-    height: 77px;
-    line-height: 77px;
-    padding-left: 54px;
+    height: 78px;
+    line-height: 78px;
+    padding: 0 10px;
 }
 .chooseBtn{
 	font-size: 30px;
@@ -273,10 +287,18 @@ page {
 	height: 118px;
 }
 .room{
-	width: 325px;
+	width: 321px;
 }
-.number{
-	width: 313px;
+.info-patient .number{
+	width: 318px;
+	font-size: 45px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.uni-notice{
+	padding-left: 20px;
+	width: calc(100% - 370px);
 }
 .content {
 	position: relative;

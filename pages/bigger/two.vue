@@ -26,23 +26,27 @@
 					</view>
 				</view>
 				<view class="room">
-					<view v-if="item.pastName">
+					<!-- <view v-if="item.pastName">
 						<text class="pl-15">{{item.pastName}}</text>
+					</view> -->
+					<view class="uni-notice">
+						<uni-notice-bar scrollable="true" single="true" :text="item.pastName" color="#000"></uni-notice-bar>
 					</view>
 				</view>
 			</view>
 		</view>
 		<view class="footer">
-			温馨提示：请持票等待呼叫！
+			<uni-notice-bar scrollable="true" single="true" :text="tips"></uni-notice-bar>
 		</view>
-		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showPlaySound="true" :showIType="true" :showScreenNumber="true"></popupSet>
+		<popupSet ref="popupSet" @confirm="confirm" @close="close" backgroundColor="transparent" :showwText="true" :dataInit="dataPopup" color="#fff" :showPlaySound="true" :showIType="true" ></popupSet>
 	</view>
 </template>
 
 <script>
 	import popupSet from '../../components/popup-set/popup-set.vue';
+	import uniNoticeBar from '@/components/uni-notice-bar/uni-notice-bar.vue'
 	export default {
-		components: { popupSet },
+		components: { popupSet ,uniNoticeBar},
 		data() {
 			return {
 				title:'超声科',
@@ -81,26 +85,31 @@
 					iType:'',
 					screenNumber:'',
 					playSound:false,
+					text:'',
 				},
 				voicePlayNumber:0,
+				voicePlayTiems:0,
+				text:'',
+				tips:'',
+				reload:'',
 			}
 		},
 		onLoad() {
-			this.iType = uni.getStorageSync('iType')||'';
-			this.screenNumber = uni.getStorageSync('screenNumber') || '';
-			this.playSound = uni.getStorageSync('playSound') || false;
+			let dataInit = uni.getStorageSync('dataInit')||{};
+			this.iType = dataInit.iType || '';
+			this.playSound = dataInit.playSound || false;
+			this.text = dataInit.text || '';
 			if(this.iType){
 				this.init();
 				this.dataPopup.iType = this.iType;
-				this.dataPopup.screenNumber = this.screenNumber;
 				this.dataPopup.playSound = this.playSound;
+				this.dataPopup.text = this.text;
 			}
 	
 		},
 		methods: {
 			// 打开设置
 			open(){
-				console.log("open");
 				this.$refs.popupSet.open();
 				this.popupShow = true;
 			},
@@ -114,8 +123,8 @@
 			//确定设置
 			confirm(res) {
 				this.iType = res.iType;
-				this.screenNumber = res.screenNumber;
 				this.playSound = res.playSound;
+				this.text = res.text;
 				this.popupShow = false;
 				this.init();
 			},
@@ -124,62 +133,116 @@
 				if(this.popupShow){
 					return false;
 				}
-				let datas = [{room:'检查室203',number:'GX124',department:'数字胃肠镜',seeingName:'吴先杰吴先杰吴先杰',seeingNumber:'321',waitingName:'吴先杰',waitingNumber:'321',pastName:'我先杰',},{room:'摄片室—205',number:'GX124',department:'反射科',seeingName:'吴先杰',seeingNumber:'321',waitingName:'吴先杰',waitingNumber:'321',pastName:'我先杰',},]
-				datas[0].seeingNumber = this.testNubmer++;
-				let dataMaps = [];
-				let voiceDataInit = [];
-				datas.forEach((data,index) =>{
-					let waitingName =data.waitingName?this.$util.hideName(data.waitingName):'';
-					let seeingName =data.seeingName?this.$util.hideName(data.seeingName):'';
-					let dataMap = {
-						room:data.room,
-						number:data.number,
-						department:data.department,
-						seeingName:seeingName,
-						seeingNumber:data.seeingNumber,
-						waitingName:waitingName,
-						waitingNumber:data.waitingNumber,
-						pastName:data.pastName,
-					}
-					dataMaps = dataMaps.concat(dataMap);
-					if(seeingName && this.playSound){
-						let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
-						let speakText = `请,${number}号,${data.seeingName}到,${dataMap.room}就诊`;
-						if(this.data.length==0){
-							this.voiceData.push(speakText);
-							this.voiceDataInit.push(speakText);
-						}else{
-							voiceDataInit = voiceDataInit.concat(speakText);
+				// 测试使用
+				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	},
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	},
+				// 	]}
+				
+				this.$request({
+					url: 'Queue/GetQueueAndCompleteList',
+					data:{
+						examClass: this.iType,
+						queueName: this.text,
+						apmFlag: '',
+					},
+					method: 'POST',
+					success: datas => {
+						try{
+							if(datas.reload=='true' || datas.reload==true){
+								this.$tui.webView.postMessage({
+									data: {
+										reload:datas.reload
+									}
+								})
+								return;
+							}
+							if(datas.queueDtoList.length>2){
+								datas.queueDtoList = datas.queueDtoList.slice(0,2);
+							}
+							this.tips = datas.scrolling;
+							let dataMaps = [];
+							let voiceDataInit = [];
+							datas.queueDtoList.forEach((data,index) =>{
+								let seeingName =data.name?this.$util.hideName(data.name):'';
+								let waiting = [];
+								let waitingName = '';
+								if(data.waitList.length>0){
+									waiting = data.waitList[0];
+									waitingName =waiting.name?this.$util.hideName(waiting.name):'';
+								}
+								let calledNumbera = data.completeList.map(item => {
+									return item.queueNo;
+								})
+								let dataMap = {
+									room:data.queueName,
+									seeingNumber:data.queueNo,
+									seeingName:seeingName,
+									department:data.examClass,
+									pastName:calledNumbera.join(),
+									waitingName:waitingName,
+									waitingNumber:waiting.queueNo,
+								}
+								dataMaps = dataMaps.concat(dataMap);
+								if(seeingName && this.playSound){
+									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
+									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									if(this.data.length==0){
+										this.voiceData.push(speakText);
+										this.voiceDataInit.push(speakText);
+									}else{
+										voiceDataInit = voiceDataInit.concat(speakText);
+									}
+								}
+							})
+							this.data = dataMaps;
+							if(this.playSound){
+								if(voiceDataInit.length>0){
+									this.voiceData = this.$util.findDifferentElements(voiceDataInit,this.voiceDataInit);
+									this.voiceDataInit = voiceDataInit;
+								}
+								if(this.voiceData.length>0){
+									this.voiceQueue();	
+								}else{
+									setTimeout(() => {
+										this.init()
+									}, 6000);
+								}
+							}else{
+								setTimeout(() => {
+									this.init();
+								}, 6000);
+							}
+						}catch(e){
+							console.error(e);
+							setTimeout(() => {
+								this.init();
+							}, 6000);
 						}
+					},
+					fail: err => {
+						setTimeout(() => {
+							this.init();
+						}, 6000);
 					}
 				})
-				this.data = dataMaps;
-				if(this.playSound){
-					if(voiceDataInit.length>0){
-						this.voiceData = this.$util.findDifferentElements(voiceDataInit,this.voiceDataInit);
-						this.voiceDataInit = voiceDataInit;
-					}
-					if(this.voiceData.length>0){
-						this.voiceQueue();	
-					}else{
-						setTimeout(() => {
-							this.init()
-						}, 5000);
-					}
-				}else{
-					setTimeout(() => {
-						this.init();
-					}, 5000);
-				}		
 			},
 			// 语音队列
 			voiceQueue(){
 				let text = this.voiceData[0] ; 
-				// this.$tui.webView.postMessage({
-				// 	data: {
-				// 		text:text
-				// 	}
-				// })
+				this.$tui.webView.postMessage({
+					data: {
+						text:text
+					}
+				})
 				console.log(text);
 				if(this.voiceData.length>1){
 					this.onDone(this.voiceData[1]);
@@ -198,7 +261,7 @@
 				}
 				setTimeout(() => {
 					this.voicePlayNumber++;
-					if(this.voicePlayNumber>=2){
+					if(this.voicePlayNumber>=this.voicePlayTiems){
 						this.voiceData.shift();
 						this.voicePlayNumber = 0;
 					}
@@ -217,6 +280,14 @@
 </script>
 
 <style>
+
+.footer{
+	color: #FFFFFF;
+    font-size: 44px;
+    height: 78px;
+    line-height: 78px;
+    padding: 0 10px;
+}
 .pr-15{
 	padding-right: 15px;
 }
@@ -234,13 +305,7 @@ page {
 	padding-right: 10px;
 	height: 762px;
 }
-.footer{
-	color: #FFFFFF;
-    font-size: 44px;
-    height: 78px;
-    line-height: 78px;
-    padding-left: 54px;
-}
+
 .chooseBtn{
 	font-size: 30px;
 	width: 438px;
@@ -261,6 +326,7 @@ page {
 .content {
 	position: relative;
 	height: 100%;
+	width: 1920px;
 }
 .type{
 	font-size: 70px;

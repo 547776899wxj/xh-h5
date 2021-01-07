@@ -68,6 +68,9 @@ export default {
 					console.log(this.failTextr);
 				},
 				complete: () => {}
+				
+				
+				
 			});
 		}
 	}

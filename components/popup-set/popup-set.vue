@@ -16,6 +16,10 @@
 						<view class="popup-title">屏幕：</view>
 						<input class="uni-input" v-model="dataInit.screenNumber" type="number" placeholder="第一个屏幕输入:1" />
 					</view>
+					<view class="uni-form-item" v-if="showwText">
+						<view class="popup-title" >诊室：</view>
+						<textarea class="uni-input" v-model="dataInit.text" auto-height  placeholder="多诊室逗号隔开,例(诊室1,诊室2)"/>
+					</view>
 					<view class="uni-form-item" v-if="showPlaySound">
 						<view class="popup-title">声音：</view>
 						<radio-group @change="radioChange" class="radio-group">
@@ -64,16 +68,21 @@ export default {
 					iType:'',
 					screenNumber:'',
 					playSound:false,
+					text:'',
 				}
 			}
 		},
 		iTypeText:{
 			type:String,
-			default:'诊室'
+			default:'科室'
 		},
 		iTypeTitle:{
 			type:String,
 			default:'标题'
+		},
+		showwText:{
+			type: Boolean,
+			default: false
 		},
 		//标题
 		showTitle: {
@@ -96,6 +105,8 @@ export default {
 			default: false
 		}
 	},
+	mounted(){
+	},
 	methods:{
 		// 打开设置
 		open(){
@@ -109,27 +120,23 @@ export default {
 		},
 		//确定设置
 		confirm(){
-			
 			uni.showLoading({
 				title: '加载中',
 			});
-			uni.setStorageSync('iType',this.dataInit.iType);
-			uni.setStorageSync('screenNumber', this.dataInit.screenNumber);
-			uni.setStorageSync('title', this.dataInit.title);
-			uni.setStorageSync('playSound', this.dataInit.playSound);
+			uni.setStorageSync('dataInit',this.dataInit);
 			this.$refs.popup.close();
 			this.$emit('confirm',this.dataInit)
 			uni.hideLoading();
 		},
 		navTo(){
 			uni.setStorageSync('pageSetBoolean',false);
-			// this.$tui.webView.redirectTo({
-			// 	url: '../index/index?webView=true',
-			// })
-			uni.redirectTo({
+			this.$tui.webView.redirectTo({
 				url: '../index/index?webView=true',
-				complete: () => {}
-			});
+			})
+			// uni.redirectTo({
+			// 	url: '../index/index?webView=true',
+			// 	complete: () => {}
+			// });
 		},
 		//声音设置
 		radioChange(evt) {
@@ -177,6 +184,7 @@ export default {
 	font-size: 25px;
 	border: 1px solid;
 	padding: 20px 30px;
+	width: 350px;
 }
 .uni-form-item.form-item-bottom{
 	padding-bottom: 40px;
