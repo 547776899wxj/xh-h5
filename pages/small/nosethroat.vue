@@ -25,10 +25,10 @@
 				</view>
 				<view class="room" >
 					<view v-for="(item,index) in data.wating" :key="index" class="room-list" :class="index%2==0?'room-list-left':'room-list-right'">
-						<view v-if="item.number">
-							<text class="">{{item.number}}号</text>
+						<view >
+							<text class="" v-if="item.number">{{item.number}}号</text>
 							<text class="pl-15">{{item.name}}</text>
-							<text v-if="index%2==0">，</text>
+							<text>，</text>
 						</view>
 					</view>
 				</view>
@@ -56,21 +56,24 @@
 		data() {
 			return {
 				title:'电子鼻咽喉镜室',
+				// data:{
+				// 	room:'检查室203',
+				// 	number:'GX124',
+				// 	department:'数字胃肠镜',
+				// 	seeingName:'吴先杰',
+				// 	seeingNumber:'3211',
+				// 	wating:[
+				// 		{name:'陈琳',number:'3412'},
+				// 		{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
+				// 		{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
+				// 		{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
+				// 		{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
+				// 		{name:'陈琳',number:'3412'},
+				// 	],
+				// 	pastName:'我先杰',
+				// },
 				data:{
-					room:'检查室203',
-					number:'GX124',
-					department:'数字胃肠镜',
-					seeingName:'吴先杰',
-					seeingNumber:'3211',
-					wating:[
-						{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},
-					],
-					pastName:'我先杰',
+					wating:[],
 				},
 				calledNumbera:'',
 				iType:'',
@@ -88,11 +91,14 @@
 				},
 				text:'',
 				voicePlayNumber:0,
+				voicePlayTiems:3,
 				tips:'',
 				reload:false,
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType||'';
 			this.title = dataInit.title||'';
@@ -136,7 +142,7 @@
 				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
 				// 	{
 				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",},{"queueNo": "CT843","name": "黎洋等",},{"queueNo": "CT843","name": "黎洋等",}]
+				// 	"waitList":[{"queueNo": null,"name": "黎洋等",},{"queueNo": "","name": "黎洋等",},]
 				// 	},
 				// 	]}
 				this.$request({
@@ -160,7 +166,7 @@
 							this.tips = datas.scrolling;
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 							let dataMaps = [];
 							let voiceDataInit = [];
 							datas.queueDtoList.forEach((data,index) =>{
@@ -185,18 +191,52 @@
 						catch(err){
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 						}
 						
 					},
 					fail: err => {
 						setTimeout(() => {
 							this.init();
-						}, 6000);
+						}, this.interval);
 					}
 				})
 			},
-		
+			// 语音队列
+			voiceQueue(){
+				let text = this.voiceData[0] ; 
+				this.$tui.webView.postMessage({
+					data: {
+						text:text
+					}
+				})
+				console.log(text);
+				if(this.voiceData.length>1){
+					this.onDone(this.voiceData[1]);
+				}else{
+					this.onDone(this.voiceData[0]);
+				}
+			},
+			// 播放完执行
+			onDone(data){
+				let date = 4300;
+				if(data.length>12){
+					date = date + ((data.length - 12)*300 ) 
+				}
+				setTimeout(() => {
+					this.voicePlayNumber++;
+					if(this.voicePlayNumber>=this.voicePlayTiems){
+						this.voiceData.shift();
+						this.voicePlayNumber = 0;
+					}
+					if(this.voiceData.length>0){
+						this.voiceQueue()
+					}else{
+						this.init()
+					}
+				}, date);
+				
+			},
 		}
 	}
 </script>
@@ -228,7 +268,7 @@
 			&.wait{
 				height: 780px;
 				.room{
-					font-size: 58px;
+					font-size: 59px;
 					padding: 64px 0;
 				}
 			}
@@ -401,22 +441,25 @@ page {
 	padding-right: 13px;
 }
 .info-patient.wait .room{
-	font-size: 38px;
+	font-size: 39px;
+	font-weight: bold;
 	display: flex;
 	padding: 25px 0;
 	flex-wrap: wrap;
 }
 .info-patient.wait .room .room-list{
-	padding: 26px 0;
+	padding: 26px 0px;
+	width: 33.33%;
+	text-align: left;
 }
-.room-list-left{
-	width: 51%;
-	text-align: end;
-}
-.room-list-right{
-	width: 49%;
-	text-align: start;
-}
+// .room-list-left{
+// 	width: 31%;
+// 	text-align: end;
+// }
+// .room-list-right{
+// 	width: 30%;
+// 	text-align: start;
+// }
 .info-patient .room.data{
 	color: rgb(113,17,18);
 	font-size: 60px;

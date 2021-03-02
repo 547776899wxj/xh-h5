@@ -5,7 +5,7 @@
 			<view class="type-text">检查室</view>
 			<view class="type-text">当前检查</view>
 			<view class="type-text">候诊</view>
-			<view class="type-text">过号</view>
+			<view class="type-text">已叫号</view>
 		</view>
 		<view class="info">
 			<view class="info-patient" v-for="(item,index) in data" :key="index">
@@ -19,8 +19,8 @@
 					</view>
 				</view>
 				<view class="room">
-					<view v-if="item.waitingNumber">
-						<text class="pr-15">{{item.waitingNumber}}号</text>
+					<view >
+						<text class="pr-15" v-if="item.waitingNumber">{{item.waitingNumber}}号</text>
 						<text class="pl-15">{{item.waitingName}}</text>
 					</view>
 				</view>
@@ -100,9 +100,11 @@
 				voicePlayNumber:0,
 				voicePlayTiems:0,
 				tips:'',
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType || '';
 			this.playSound = dataInit.playSound || false;
@@ -226,24 +228,24 @@
 								}else{
 									setTimeout(() => {
 										this.init()
-									}, 6000);
+									}, this.interval);
 								}
 							}else{
 								setTimeout(() => {
 									this.init();
-								}, 6000);
+								}, this.interval);
 							}
 						}catch(e){
 							console.error(e);
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 						}
 					},
 					fail: err => {
 						setTimeout(() => {
 							this.init();
-						}, 6000);
+						}, this.interval);
 					}
 				})
 			},
@@ -255,13 +257,11 @@
 						text:text
 					}
 				})
+				console.log(text);
 				if(this.voiceData.length>1){
 					this.onDone(this.voiceData[1]);
 				}else{
-					this.voiceData = [];
-					setTimeout(() => {
-						this.init()
-					}, 5000);
+					this.onDone(this.voiceData[0]);
 				}
 			},
 			// 播放完执行
@@ -272,16 +272,14 @@
 				}
 				setTimeout(() => {
 					this.voicePlayNumber++;
-					if(this.voicePlayNumber>=2){
+					if(this.voicePlayNumber>=this.voicePlayTiems){
 						this.voiceData.shift();
 						this.voicePlayNumber = 0;
 					}
 					if(this.voiceData.length>0){
 						this.voiceQueue()
 					}else{
-						setTimeout(() => {
-							this.init()
-						}, 5000);
+						this.init()
 					}
 				}, date);
 				

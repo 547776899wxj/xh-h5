@@ -64,9 +64,11 @@
 				text:'',
 				dataPage:[],
 				pageNewNumber:1,
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType||'';
 			this.title = dataInit.title||'';

@@ -91,15 +91,6 @@
 		    }
 		},
 		{
-		    "path" : "pages/skin/skin",
-		    "style": {
-		    	"navigationBarTitleText": "",
-		    	"app-plus": {
-		    		"titleNView": false //禁用原生导航栏
-		    	}
-		    }
-		},
-		{
 		    "path" : "pages/bigger/nosethroat",
 		    "style": {
 		    	"navigationBarTitleText": "",

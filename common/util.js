@@ -33,9 +33,13 @@ function chineseNumeral(data){
 	}
 	return tmpnewchar;
 }
-
+//请求间隔时间
+function getRequestInterval (){
+	return 60000
+}
 module.exports = {
 	hideName,
 	findDifferentElements,
 	chineseNumeral,
+	getRequestInterval,
 }

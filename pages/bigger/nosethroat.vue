@@ -18,14 +18,14 @@
 				<view class="info-title">等候检查</view>
 				<view class="wait">
 					<view v-for="(item,index) in data.wating" :key="index">
-						<text>{{item.number}}号</text>
+						<text v-if="item.number">{{item.number}}号</text>
 						<text>{{item.name}}</text>
 						<text v-if="(index+1)%3!=0">，</text>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="tips">
+		<!-- <view class="tips">
 			<view class="tips-title">
 				温馨提示
 			</view>
@@ -36,7 +36,7 @@
 					3、20分钟后至候诊厅自助打印报告
 				</text>
 			</view>
-		</view>
+		</view> -->
 		<view class="footer">
 			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="47px"></uni-notice-bar>
 		</view>
@@ -72,11 +72,14 @@
 				},
 				text:'',
 				voicePlayNumber:0,
+				voicePlayTiems:3,
 				tips:'',
 				reload:false,
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType||'';
 			this.title = dataInit.title||'';
@@ -117,15 +120,7 @@
 					return false;
 				}
 				// 测试使用
-				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
-				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
-				// 	},
-				// 	]}
 					
-				
 				this.$request({
 					url: 'Queue/GetQueue',
 					data:{
@@ -144,21 +139,15 @@
 								})
 								return;
 							}
-							if(datas.queueDtoList.length>7){
-								datas.queueDtoList = datas.queueDtoList.slice(0,7);
-							}
 							this.tips = datas.scrolling;
 							let dataMaps = [];
 							let voiceDataInit = [];
 							datas.queueDtoList.forEach((data,index) =>{
 								let seeingName =data.name?this.$util.hideName(data.name):'';
-								let calledNumbera = data.completeList.map(item => {
-									return item.queueNo;
-								})
 								let wating = data.waitList.map(item => {
 									return {
 										name: item.name?this.$util.hideName(item.name):'',
-										number:item.queueNo
+										number:item.queueNo || '',
 									}
 								})
 								let dataMap = {
@@ -166,8 +155,7 @@
 									seeingNumber:data.queueNo,
 									seeingName:seeingName,
 									department:data.examClass,
-									pastName:calledNumbera.join(),
-									wating:wating
+									wating:wating.slice(0,12)
 								}
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
@@ -193,23 +181,24 @@
 								}else{
 									setTimeout(() => {
 										this.init()
-									}, 6000);
+									}, this.interval);
 								}
 							}else{
 								setTimeout(() => {
 									this.init();
-								}, 6000);
+								}, this.interval);
 							}
 						}catch(e){
+							console.error(e);
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 						}
 					},
 					fail: err => {
 						setTimeout(() => {
 							this.init();
-						}, 6000);
+						}, this.interval);
 					}
 				})
 			},
@@ -221,13 +210,11 @@
 						text:text
 					}
 				})
+				console.log(text);
 				if(this.voiceData.length>1){
 					this.onDone(this.voiceData[1]);
 				}else{
-					this.voiceData = [];
-					setTimeout(() => {
-						this.init()
-					}, 5000);
+					this.onDone(this.voiceData[0]);
 				}
 			},
 			// 播放完执行
@@ -238,16 +225,14 @@
 				}
 				setTimeout(() => {
 					this.voicePlayNumber++;
-					if(this.voicePlayNumber>=2){
+					if(this.voicePlayNumber>=this.voicePlayTiems){
 						this.voiceData.shift();
 						this.voicePlayNumber = 0;
 					}
 					if(this.voiceData.length>0){
 						this.voiceQueue()
 					}else{
-						setTimeout(() => {
-							this.init()
-						}, 5000);
+						this.init()
 					}
 				}, date);
 				
@@ -289,7 +274,7 @@ page {
 			text-align: center;
 		}
 		.room{
-			height: 510px;
+			height: 762px;
 			&.current{
 				display: flex;
 				justify-content: center;

@@ -62,6 +62,15 @@ export default class Http{
 				reject && reject(err)
 				return 
 			}
+			if(data.data.status == 0){
+				uni.showToast({
+					icon: 'none',
+					title: '失败',
+					duration: 3000
+				})
+				reject && reject(err)
+				return 
+			}
 			// 回调函数
 			let callBack = resolve;
 			callBack && callBack(data.data)

@@ -1,11 +1,7 @@
 <script>
 	export default {
 		onLaunch: function() {
-			this.$tui.webView.postMessage({
-				data: {
-					successful:true
-				}
-			})
+			
 		},
 		onShow: function() {
 			console.log('App Show')

@@ -7,19 +7,19 @@
 			<view>
 				<view class="info-patient" v-for="(item,index) in data.slice(0,5)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number || item.seeingName}}</view>
+					<view class="number">{{item.number}}</view>
 				</view>
 			</view>
 			<view>
 				<view class="info-patient" v-for="(item,index) in data.slice(5,10)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number || item.seeingName}}</view>
+					<view class="number">{{item.number}}</view>
 				</view>
 			</view>
 			<view>
 				<view class="info-patient" v-for="(item,index) in data.slice(10,15)" :key="index">
 					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number || item.seeingName}}</view>
+					<view class="number">{{item.number}}</view>
 				</view>
 			</view>
 		</view>
@@ -50,7 +50,7 @@
 				calledNumbera:'',
 				iType:'',
 				popupShow:false,
-				seqNumber:'',
+				seqNumber:'',  
 				voiceData:[],
 				testNubmer:0,
 				voiceDataInit:[],
@@ -62,13 +62,15 @@
 					text:'',
 				},
 				voicePlayNumber:0,
-				voicePlayTiems:0,
+				voicePlayTiems:3,
 				text:'',
 				tips:'',
 				reload:false,
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType || '';
 			this.playSound = dataInit.playSound || false;
@@ -159,7 +161,7 @@
 								let seeingName =data.name?this.$util.hideName(data.name):'';
 								let dataMap = {
 									room:data.queueName,
-									number:data.queueNo,
+									number:data.queueNo || '',
 									seeingName:seeingName,
 								}
 								dataMaps = dataMaps.concat(dataMap);
@@ -185,25 +187,25 @@
 								}else{
 									setTimeout(() => {
 										this.init()
-									}, 6000);
+									}, this.interval);
 								}
 							}else{
 								setTimeout(() => {
 									this.init();
-								}, 6000);
+								}, this.interval);
 							}
 						}
 						catch(err){
 							console.error(e);
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 						}
 					},
 					fail: err => {
 						setTimeout(() => {
 							this.init();
-						}, 6000);
+						}, this.interval);
 					}
 				})
 				
@@ -216,13 +218,11 @@
 						text:text
 					}
 				})
+				console.log(text);
 				if(this.voiceData.length>1){
 					this.onDone(this.voiceData[1]);
 				}else{
-					this.voiceData = [];
-					setTimeout(() => {
-						this.init()
-					}, 6000);
+					this.onDone(this.voiceData[0]);
 				}
 			},
 			// 播放完执行
@@ -240,9 +240,7 @@
 					if(this.voiceData.length>0){
 						this.voiceQueue()
 					}else{
-						setTimeout(() => {
-							this.init()
-						}, 6000);
+						this.init()
 					}
 				}, date);
 				

@@ -20,7 +20,7 @@
 			<view class="info-patient pt-15">
 				<view class="room" >
 					<view v-for="(item,index) in data.wating" :key="index">
-						<view v-if="item.number">
+						<view>
 							<text class="pr-15">{{item.number?item.number+'号':''}}</text>
 							<text class="pl-15">{{item.name}}</text>
 						</view>
@@ -69,14 +69,17 @@
 					text:'',
 				},
 				voicePlayNumber:0,
+				voicePlayTiems:3,
 				text:'',
 				dataPage:[],
 				pageNewNumber:1,
 				reload:false,
 				tips:'',
+				interval:10000,
 			}
 		},
 		onLoad() {
+			this.interval = this.$util.getRequestInterval();
 			let dataInit = uni.getStorageSync('dataInit')||{};
 			this.iType = dataInit.iType||'';
 			this.title = dataInit.title||'';
@@ -144,6 +147,7 @@
 				// 	},
 					
 				// 	],reload:"false"}
+					
 				this.$request({
 					url: 'Queue/GetQueue',
 					data:{
@@ -173,12 +177,10 @@
 								let seeingName =data.name?this.$util.hideName(data.name):'';
 								let wating = [];
 								data.waitList.forEach(item => {
-									if(item.queueNo){
-										wating.push({
-											name: item.name?this.$util.hideName(item.name):'',
-											number:item.queueNo || ''
-										})
-									}
+									wating.push({
+										name: item.name?this.$util.hideName(item.name):'',
+										number:item.queueNo || ''
+									})
 								})
 								let dataMap = {
 									room:data.queueName,
@@ -198,15 +200,50 @@
 							console.error(err)
 							setTimeout(() => {
 								this.init();
-							}, 6000);
+							}, this.interval);
 						}
 					},
 					fail: err => {
 						setTimeout(() => {
 							this.init();
-						}, 6000);
+						}, this.interval);
 					}
 				})
+				
+			},
+			// 语音队列
+			voiceQueue(){
+				let text = this.voiceData[0] ; 
+				this.$tui.webView.postMessage({
+					data: {
+						text:text
+					}
+				})
+				console.log(text);
+				if(this.voiceData.length>1){
+					this.onDone(this.voiceData[1]);
+				}else{
+					this.onDone(this.voiceData[0]);
+				}
+			},
+			// 播放完执行
+			onDone(data){
+				let date = 4300;
+				if(data.length>12){
+					date = date + ((data.length - 12)*300 ) 
+				}
+				setTimeout(() => {
+					this.voicePlayNumber++;
+					if(this.voicePlayNumber>=this.voicePlayTiems){
+						this.voiceData.shift();
+						this.voicePlayNumber = 0;
+					}
+					if(this.voiceData.length>0){
+						this.voiceQueue()
+					}else{
+						this.init()
+					}
+				}, date);
 				
 			},
 		}
