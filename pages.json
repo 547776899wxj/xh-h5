@@ -98,6 +98,24 @@
 		    		"titleNView": false //禁用原生导航栏
 		    	}
 		    }
+		},
+		{
+		    "path" : "pages/small/twoNew",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/small/digestionNew",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
 		}
     ],
 	"globalStyle": {
