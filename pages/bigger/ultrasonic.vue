@@ -27,11 +27,11 @@
 			<view class="room">已叫号码</view>
 			<!-- <view class="number">{{calledNumbera}}</view> -->
 			<view class="uni-notice">
-				<uni-notice-bar scrollable="true" single="true" :text="calledNumbera" color="#000"></uni-notice-bar>
+				<uni-notice-bar scrollable="true" single="true" :text="calledNumbera" color="#000" :fontSize="noticeFontSize" ></uni-notice-bar>
 			</view>
 		</view>
 		<view class="footer">
-			<uni-notice-bar scrollable="true" single="true" :text="tips"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" :fontSize="noticeFontSize" :height="noticeFontSize"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close" :showTitle="true" :showwText="true" :dataInit="dataPopup"  :showPlaySound="true" :showIType="true" ></popupSet>
 	</view>
@@ -67,6 +67,7 @@
 				tips:'',
 				reload:false,
 				interval:10000,
+				noticeFontSize:''
 			}
 		},
 		onLoad() {
@@ -76,11 +77,6 @@
 			this.playSound = dataInit.playSound || false;
 			this.text = dataInit.text || '';
 			this.title = dataInit.title || '';
-			this.$tui.webView.postMessage({
-				data: {
-					reload:123
-				}
-			})
 			if(this.iType){
 				this.init();
 				this.dataPopup.iType = this.iType;
@@ -88,6 +84,15 @@
 				this.dataPopup.text = this.text;
 				this.dataPopup.title = this.title;
 			}
+			uni.getSystemInfo({
+			    success: (res) =>{
+					if(res.windowWidth < 1600 ){
+						this.noticeFontSize = '30px'
+					}else{
+						this.noticeFontSize = '44px'
+					}
+			    }
+			});
 		},
 		methods: {
 			// 打开设置
@@ -98,9 +103,7 @@
 			// 关闭设置
 			close(){
 				this.popupShow = false;
-				if(this.iType){
-					this.init();
-				}
+				this.init();
 			},
 			//确定设置
 			confirm(res) {
@@ -167,7 +170,8 @@
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
-									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									number = number?number+'号':'';
+									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -249,7 +253,8 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+
 .pr-15{
 	padding-right: 15px;
 }
@@ -272,6 +277,7 @@ page {
     height: 78px;
     line-height: 78px;
     padding: 0 10px;
+	overflow: hidden;
 }
 .chooseBtn{
 	font-size: 30px;
@@ -360,5 +366,51 @@ page {
 	height: 112px;
 	line-height: 112px;
 	padding-left: 54px;
+}
+@media screen and (min-width: 900px) and (max-width: 1300px) {
+	.content{
+		.bg {
+			height: 720px;
+			width: 1280px;
+		}
+		.title{
+			height: 80px;
+			line-height: 80px;
+			font-size: 54px;
+			padding-top: 76.7px;
+		}
+		.tip{
+			height: 74.6px;
+			line-height: 74.6px;
+			font-size: 34px;
+			padding-left: 36px;
+		}
+		.info{
+			height: 363.3px;
+		}
+		.uni-notice{
+			padding-left: 13px;
+			width: calc(100% - 246.8px);
+		}
+		.footer{
+		    font-size: 34px;
+		    height: 52px;
+		    line-height: 52px;
+		    padding: 0 10px;
+		}
+		.info-patient{
+			height: 72.7px;
+			view{
+				font-size: 36.7px;
+			}
+			.room{
+				width: 214px;
+			}
+			.number{
+				width: 212.1px;
+				font-size: 30px;
+			}
+		}
+	}
 }
 </style>

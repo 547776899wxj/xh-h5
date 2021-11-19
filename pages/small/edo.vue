@@ -6,22 +6,22 @@
 		<image class="bg" src="../../static/triage_small_second.png" ></image>
 		<view class="title">
 			<view class="title-dep">{{title}}</view>
-			<view class="title-room">{{iType}}</view>
+			<view class="title-room">{{text}}</view>
 		</view>
 		<view class="info">
 			<view class="info-patient">
-				<view class="data">
-					<view v-if="data.seeingNumber">
-						<text class="pr-15">{{data.seeingNumber}}号</text>
-						<text class="pl-15">{{data.seeingName}}</text>
+				<view class="data" >
+					<view >
+						<text class="pr-15" v-if="seeing.number">{{seeing.number?seeing.number+'号':''}}</text>
+						<text class="pl-15">{{seeing.name}}</text>
 					</view>
 				</view>
 			</view>
 			<view class="info-patient pt-15">
 				<view class="room" >
 					<view v-for="(item,index) in data.wating" :key="index">
-						<view v-if="item.number">
-							<text class="pr-15">{{item.number}}号</text>
+						<view>
+							<text class="pr-15">{{item.number?item.number+'号':''}}</text>
 							<text class="pl-15">{{item.name}}</text>
 						</view>
 					</view>
@@ -29,9 +29,9 @@
 			</view>
 		</view>
 		<view class="footer">
-			<uni-notice-bar scrollable="true" single="true" text="温馨提示：请保持安静，有序就诊！" fontSize="30px" height="30px"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
 		</view>
-		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true" :showIType="true" ></popupSet>
+		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true"  ></popupSet>
 	</view>
 </template>
 
@@ -44,14 +44,22 @@
 			return {
 				title:'超声科检查室',
 				data:{
-					
+					// room:'检查室203',
+					// number:'GX124',
+					// department:'数字胃肠镜',
+					// seeingName:'吴先姐',
+					// seeingNumber:'3211',
+					// wating:[
+					// 	{name:'陈琳',number:'3412'},
+					// 	{name:'陈琳',number:'3412'},
+					// ],
 				},
 				calledNumbera:'',
 				iType:'',
 				popupShow:false,
 				seqNumber:'',
 				voiceData:[],
-				testNubmer:1,
+				testNubmer:0,
 				voiceDataInit:[],
 				dataPopup:{
 					title:'',
@@ -61,10 +69,17 @@
 					text:'',
 				},
 				voicePlayNumber:0,
+				voicePlayTiems:3,
 				text:'',
 				dataPage:[],
 				pageNewNumber:1,
+				reload:false,
+				tips:'',
 				interval:10000,
+				seeing:{
+					name:'',
+					number:'',
+				}
 			}
 		},
 		onLoad() {
@@ -74,27 +89,26 @@
 			this.title = dataInit.title||'';
 			this.text = dataInit.text||'';
 			this.playSound = dataInit.playSound || false;
-			if(this.iType){
-				this.init();
-				this.dataPopup.iType = this.iType;
-				this.dataPopup.title = this.title;
-				this.dataPopup.playSound = this.playSound;
-				this.dataPopup.text = this.text||'';
-			}
+			this.init();
+			this.dataPopup.iType = this.iType;
+			this.dataPopup.title = this.title;
+			this.dataPopup.playSound = this.playSound;
+			this.dataPopup.text = this.text||'';
 		},
 		methods: {
 			// 翻页
 			page(){
 				if(this.dataPage.length>this.pageNewNumber){
 					setTimeout(() => {
-						this.data = this.dataPage.slice(this.pageNewNumber,++this.pageNewNumber)[0];
+						let data = this.dataPage.slice(this.pageNewNumber,++this.pageNewNumber)[0];
+						this.data = data;
 						this.page();
 					}, 5000);
 				}
 				else{
 					setTimeout(() => {
 						this.pageNewNumber = 1;
-						this.init();
+						this.init();  
 					}, 5000);
 				}
 			},
@@ -106,13 +120,10 @@
 			// 关闭设置
 			close(){
 				this.popupShow = false;
-				if(this.iType){
-					this.init();
-				}
+				this.init();
 			},
 			//确定设置
 			confirm(res) {
-				
 				this.iType = res.iType;
 				this.title = res.title;
 				this.playSound = res.playSound;
@@ -125,62 +136,82 @@
 				if(this.popupShow){
 					return false;
 				}
-				let datas = [{
-					room:'检查室203',
-					number:'GX124',
-					department:'数字胃肠镜',
-					seeingName:'吴先姐',
-					seeingNumber:'3211',
-					wating:[
-						{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},
-					],
-				},{
-					room:'检查室203',
-					number:'G1224',
-					department:'数字胃肠镜',
-					seeingName:'吴先接',
-					seeingNumber:'3211',
-					wating:[
-						{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},
-					],
-				},
-				{
-					room:'检查室203',
-					number:'G1224',
-					department:'数字胃肠镜',
-					seeingName:'吴先3',
-					seeingNumber:'3211',
-					wating:[
-						{name:'陈琳',number:'3412'},
-						{name:'陈琳',number:'3412'},
-					],
-				}]
-				datas[0].seeingNumber = this.testNubmer++;
-				let dataMaps = [];
-				let voiceDataInit = [];
-				datas.forEach((data,index) =>{
-					let waitingName =data.waitingName?this.$util.hideName(data.waitingName):'';
-					let seeingName =data.seeingName?this.$util.hideName(data.seeingName):'';
-					let dataMap = {
-						room:data.room,
-						number:data.number,
-						department:data.department,
-						seeingName:seeingName,
-						seeingNumber:data.seeingNumber,
-						wating:[
-							{name:'陈琳',number:'3412'},
-							{name:'陈琳',number:'3412'},
-						],
-						doctor:data.doctor
+				// 测试使用
+				// let datas = { CompleteList:[{"queueNo": null,},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": null,"name": "黎洋","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "","name": "黎洋等",},{"queueNo": "123","name": "2",},{"queueNo": "123","name": "3",}]
+				// 	},
+				// 	// {
+				// 	// "waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": '',"name": '',"reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	// "waitList":[{"queueNo": "222","name": "黎洋等2",},{"queueNo": "222","name": "2",},{"queueNo": "2222","name": "2",}]
+				// 	// },
+					
+				// 	],reload:"false"}
+					
+				this.$request({
+					url: 'Queue/GetQueueForEDO',
+					method: 'POST',
+					success: datas => {
+						try{
+							if(datas.reload=='true' || datas.reload==true){
+								this.$tui.webView.postMessage({
+									data: {
+										reload:datas.reload
+									}
+								})
+								return;
+							}
+							this.tips = datas.scrolling;
+							let dataMaps = [];
+							let voiceDataInit = [];
+							let seeing = {};
+							datas.queueDtoList.forEach((data,index) =>{
+								if(data.name){
+									seeing = {
+										name: data.name?this.$util.hideName(data.name):'',
+										number: data.queueNo || '',
+									}
+								}
+								let wating = [];
+								data.waitList.forEach(item => {
+									wating.push({
+										name: item.name?this.$util.hideName(item.name):'',
+										number:item.queueNo || ''
+									})
+								})
+								wating = wating.length>2?wating.slice(0,2):wating;
+								let dataMap = {
+									room:data.queueName,
+									wating:wating,
+								}
+								if(wating.length>0){
+									dataMaps = dataMaps.concat(dataMap);
+								}
+							})
+							this.dataPage =  dataMaps;
+							let data = dataMaps[0] || [];
+							if(seeing.name){
+								this.seeing = seeing;
+							}
+							console.log(this.data)
+							this.data = data;
+							this.page();
+						}
+						catch(err){
+							console.error(err)
+							setTimeout(() => {
+								this.init();
+							}, this.interval);
+						}
+					},
+					fail: err => {
+						setTimeout(() => {
+							this.init();
+						}, this.interval);
 					}
-					dataMaps = dataMaps.concat(dataMap);
 				})
-				this.dataPage = dataMaps;
-				this.data = dataMaps[0];
-				console.log(this.data );
-				this.page();
+				
 			},
 			// 语音队列
 			voiceQueue(){
@@ -190,13 +221,11 @@
 						text:text
 					}
 				})
+				console.log(text);
 				if(this.voiceData.length>1){
 					this.onDone(this.voiceData[1]);
 				}else{
-					this.voiceData = [];
-					setTimeout(() => {
-						this.init()
-					}, 5000);
+					this.onDone(this.voiceData[0]);
 				}
 			},
 			// 播放完执行
@@ -207,16 +236,14 @@
 				}
 				setTimeout(() => {
 					this.voicePlayNumber++;
-					if(this.voicePlayNumber>=2){
+					if(this.voicePlayNumber>=this.voicePlayTiems){
 						this.voiceData.shift();
 						this.voicePlayNumber = 0;
 					}
 					if(this.voiceData.length>0){
 						this.voiceQueue()
 					}else{
-						setTimeout(() => {
-							this.init()
-						}, 5000);
+						this.init()
 					}
 				}, date);
 				
@@ -285,6 +312,7 @@ page {
 .content {
 	position: relative;
 	height: 100%;
+	width: 768px;
 }
 
 
@@ -324,7 +352,7 @@ page {
 	padding-left: 219px;
 }
 .info-patient view {
-	font-size: 64px;
+	font-size: 60px;
 	color: #fff;
 
 	text-overflow: ellipsis;

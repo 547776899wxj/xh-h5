@@ -2,7 +2,7 @@
 	<view class="content">
 		<view class="popup">
 			<view class="popup-header">
-				设置
+				修改设置
 			</view>
 			<view>
 				<view class="uni-form-item ">

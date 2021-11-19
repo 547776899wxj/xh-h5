@@ -10,10 +10,10 @@
 		</view>
 		<view class="info">
 			<view class="info-patient">
-				<view class="data" v-if="data.seeingNumber">
+				<view class="data" >
 					<view >
-						<text class="pr-15">{{data.seeingNumber?data.seeingNumber+'号':''}}</text>
-						<text class="pl-15">{{data.seeingName}}</text>
+						<text class="pr-15" v-if="seeing.number">{{seeing.number?seeing.number+'号':''}}</text>
+						<text class="pl-15">{{seeing.name}}</text>
 					</view>
 				</view>
 			</view>
@@ -31,7 +31,7 @@
 		<view class="footer">
 			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
 		</view>
-		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true" :showIType="true" ></popupSet>
+		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true"  ></popupSet>
 	</view>
 </template>
 
@@ -76,6 +76,10 @@
 				reload:false,
 				tips:'',
 				interval:10000,
+				seeing:{
+					name:'',
+					number:'',
+				}
 			}
 		},
 		onLoad() {
@@ -85,13 +89,11 @@
 			this.title = dataInit.title||'';
 			this.text = dataInit.text||'';
 			this.playSound = dataInit.playSound || false;
-			if(this.iType){
-				this.init();
-				this.dataPopup.iType = this.iType;
-				this.dataPopup.title = this.title;
-				this.dataPopup.playSound = this.playSound;
-				this.dataPopup.text = this.text||'';
-			}
+			this.init();
+			this.dataPopup.iType = this.iType;
+			this.dataPopup.title = this.title;
+			this.dataPopup.playSound = this.playSound;
+			this.dataPopup.text = this.text||'';
 		},
 		methods: {
 			// 翻页
@@ -99,16 +101,6 @@
 				if(this.dataPage.length>this.pageNewNumber){
 					setTimeout(() => {
 						let data = this.dataPage.slice(this.pageNewNumber,++this.pageNewNumber)[0];
-						if(!data.seeingName){
-							console.log(data.seeingName);
-							this.dataPage.forEach(item =>{
-								if(item.seeingName){
-									data.seeingName = item.seeingName;
-									data.seeingNumber = item.seeingNumber;
-								}
-							})
-						}
-						console.log(data.seeingName);
 						this.data = data;
 						this.page();
 					}, 5000);
@@ -128,9 +120,7 @@
 			// 关闭设置
 			close(){
 				this.popupShow = false;
-				if(this.iType){
-					this.init();
-				}
+				this.init();
 			},
 			//确定设置
 			confirm(res) {
@@ -149,23 +139,18 @@
 				// 测试使用
 				// let datas = { CompleteList:[{"queueNo": null,},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
 				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": '11',"name": "黎洋等","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": null,"name": "黎洋","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	"waitList":[{"queueNo": "","name": "黎洋等",},{"queueNo": "123","name": "2",},{"queueNo": "123","name": "3",}]
 				// 	},
-				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": '',"name": '',"reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "222","name": "黎洋等2",},{"queueNo": "222","name": "2",},{"queueNo": "2222","name": "2",}]
-				// 	},
+				// 	// {
+				// 	// "waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": '',"name": '',"reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	// "waitList":[{"queueNo": "222","name": "黎洋等2",},{"queueNo": "222","name": "2",},{"queueNo": "2222","name": "2",}]
+				// 	// },
 					
 				// 	],reload:"false"}
 					
 				this.$request({
-					url: 'Queue/GetSmallQueue',
-					data:{
-						examClass: this.iType,
-						queueName: this.text,
-						apmFlag: '',
-					},
+					url: 'Queue/GetQueue',
 					method: 'POST',
 					success: datas => {
 						try{
@@ -180,12 +165,14 @@
 							this.tips = datas.scrolling;
 							let dataMaps = [];
 							let voiceDataInit = [];
+							let seeing = {};
 							datas.queueDtoList.forEach((data,index) =>{
-								if(!data.queueNo && this.dataPage[index]){
-									data.queueNo = this.dataPage[index].seeingNumber;
-									data.name = this.dataPage[index].seeingName;
+								if(data.name){
+									seeing = {
+										name: data.name?this.$util.hideName(data.name):'',
+										number: data.queueNo || '',
+									}
 								}
-								let seeingName =data.name?this.$util.hideName(data.name):'';
 								let wating = [];
 								data.waitList.forEach(item => {
 									wating.push({
@@ -193,26 +180,21 @@
 										number:item.queueNo || ''
 									})
 								})
+								wating = wating.length>2?wating.slice(0,2):wating;
 								let dataMap = {
 									room:data.queueName,
-									seeingNumber: data.queueNo || '',
-									seeingName:seeingName,
-									wating:wating.slice(0,2),
+									wating:wating,
 								}
-								if(wating.length>0 || dataMap.seeingNumber){
+								if(wating.length>0){
 									dataMaps = dataMaps.concat(dataMap);
 								}
 							})
 							this.dataPage =  dataMaps;
-							let data = dataMaps[0];
-							if(!data.seeingName){
-								this.dataPage.forEach(item =>{
-									if(item.seeingName){
-										data.seeingName = item.seeingName;
-										data.seeingNumber = item.seeingNumber;
-									}
-								})
+							let data = dataMaps[0] || [];
+							if(seeing.name){
+								this.seeing = seeing;
 							}
+							console.log(this.data)
 							this.data = data;
 							this.page();
 						}

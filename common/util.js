@@ -35,7 +35,7 @@ function chineseNumeral(data){
 }
 //请求间隔时间
 function getRequestInterval (){
-	return 60000
+	return 6000
 }
 module.exports = {
 	hideName,

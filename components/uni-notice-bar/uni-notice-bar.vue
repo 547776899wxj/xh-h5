@@ -14,7 +14,7 @@
 		<uni-icons v-if="showIcon === true || showIcon === 'true'" class="uni-noticebar-icon" type="sound" :color="color"
 		 size="14" />
 		<!-- #endif -->
-		<view ref="textBox" class="uni-noticebar__content-wrapper" :class="{'uni-noticebar__content-wrapper--scrollable':scrollable, 'uni-noticebar__content-wrapper--single':!scrollable && (single || moreText)}">
+		<view ref="textBox" class="uni-noticebar__content-wrapper" :style="{height:scrollableHeight}" :class="{'uni-noticebar__content-wrapper--scrollable':scrollable, 'uni-noticebar__content-wrapper--single':!scrollable && (single || moreText)}">
 			<view :id="elIdBox" class="uni-noticebar__content" :class="{'uni-noticebar__content--scrollable':scrollable, 'uni-noticebar__content--single':!scrollable && (single || moreText)}">
 				<text :id="elId" ref="animationEle" class="uni-noticebar__content-text" :class="{'uni-noticebar__content-text--scrollable':scrollable,'uni-noticebar__content-text--single':!scrollable && (single || moreText)}"
 				 :style="{height:height,lineHeight:height,fontSize:fontSize,color:color, width:wrapWidth+'px', 'animationDuration': animationDuration, '-webkit-animationDuration': animationDuration ,animationPlayState: webviewHide?'paused':animationPlayState,'-webkit-animationPlayState':webviewHide?'paused':animationPlayState, animationDelay: animationDelay, '-webkit-animationDelay':animationDelay}">{{text}}</text>
@@ -117,6 +117,10 @@
 				// 是否显示左侧关闭按钮
 				type: [Boolean, String],
 				default: false
+			},
+			scrollableHeight: {
+				type: String,
+				default: '62px'
 			}
 		},
 		data() {
@@ -150,9 +154,11 @@
 				this.webviewHide = false
 			})
 			// #endif
+			console.log(this.fontSize);
 			this.$nextTick(() => {
 				this.initSize()
 			})
+			
 		},
 		// #ifdef APP-NVUE
 		beforeDestroy() {

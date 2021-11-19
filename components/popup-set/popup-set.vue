@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<uni-popup ref="popup" type="center" :maskClick="false">
+		<uni-popup ref="popup" type="top" :maskClick="false">
 			<view class="popup">
 				<view class="popup-header">设置</view>
 				<view>

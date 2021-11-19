@@ -8,8 +8,8 @@
 			<view class="info-left">
 				<view class="info-title">当前检查</view>
 				<view class="room current" >
-					<view v-if="data.seeingNumber">
-						<text class="pr-15">{{data.seeingNumber}}号</text>
+					<view >
+						<text class="pr-15" v-if="data.seeingNumber">{{data.seeingNumber}}号</text>
 						<text class="pl-15">{{data.seeingName}}</text>
 					</view>
 				</view>
@@ -38,7 +38,7 @@
 			</view>
 		</view> -->
 		<view class="footer">
-			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="47px"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" :fontSize="noticeFontSize" :height="noticeFontSize"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close"  :dataInit="dataPopup" :showwText="true" :showIType="true" ></popupSet>
 	</view>
@@ -92,6 +92,15 @@
 				this.dataPopup.playSound = this.playSound;
 				this.dataPopup.text = this.text||'';
 			}
+			uni.getSystemInfo({
+			    success: (res) =>{
+					if(res.windowWidth < 1600 ){
+						this.noticeFontSize = '30px'
+					}else{
+						this.noticeFontSize = '44px'
+					}
+			    }
+			});
 		},
 		methods: {
 			// 打开设置
@@ -120,7 +129,15 @@
 					return false;
 				}
 				// 测试使用
-					
+				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	},
+				// 	]}
+				
+				
 				this.$request({
 					url: 'Queue/GetQueue',
 					data:{
@@ -160,7 +177,8 @@
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
-									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									number = number?number+'号':'';
+									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -242,6 +260,7 @@
 </script>
 
 <style lang="scss">
+
 .pr-15{
 	padding-right: 15px;
 }
@@ -322,5 +341,48 @@ page {
 	height: 1080px;
 	width: 1920px;
 	z-index: -1;
+}
+@media screen and (min-width: 900px) and (max-width: 1300px) {
+	.content{
+		overflow: hidden;
+	
+		.footer{
+		    font-size: 34px;
+		    height: 52px;
+		    line-height: 52px;
+		}
+		.bg {
+			height: 720px;
+			width: 1280px;
+		}
+		.info{
+			padding-top: 77.4px;
+			font-size: 54px;
+			.info-left{
+				width: 429px;
+			}
+			.info-title{
+				line-height: 80px;
+			}
+			.info-right{
+				width: 853px;
+				text-align: center;
+			}
+			.room{
+				height: 509px;
+				&.current{
+					font-size: 54px;
+				}
+			}
+			.wait{
+				font-size: 37px;
+				padding: 30px;
+				view{
+					height: 67px;
+				}
+			}
+			
+		}
+	}
 }
 </style>

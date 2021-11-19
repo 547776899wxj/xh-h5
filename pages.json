@@ -17,6 +17,15 @@
 					"titleNView": false //禁用原生导航栏
 				}
 			}
+		},
+		{
+			"path": "pages/bigger/usOne",
+			"style": {
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"titleNView": false //禁用原生导航栏
+				}
+			}
 		}
         ,{
             "path" : "pages/bigger/two",
@@ -27,6 +36,15 @@
             	}
             }
         },
+		{
+		    "path" : "pages/small/edo",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
 		{
 		    "path" : "pages/bigger/three",
 		    "style": {
@@ -91,6 +109,15 @@
 		    }
 		},
 		{
+		    "path" : "pages/small/nosethroatOld",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
 		    "path" : "pages/bigger/nosethroat",
 		    "style": {
 		    	"navigationBarTitleText": "",
@@ -110,6 +137,78 @@
 		},
 		{
 		    "path" : "pages/small/digestionNew",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/small/ctmr",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/ctmr",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/usTwo",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/water",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/edo",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/small/ctmrNoWait",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/ctmrNoWait",
+		    "style": {
+		    	"navigationBarTitleText": "",
+		    	"app-plus": {
+		    		"titleNView": false //禁用原生导航栏
+		    	}
+		    }
+		},
+		{
+		    "path" : "pages/bigger/ctmrNoWait3",
 		    "style": {
 		    	"navigationBarTitleText": "",
 		    	"app-plus": {

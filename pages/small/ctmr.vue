@@ -1,5 +1,5 @@
 /**
- * 超声科 口腔 放射科
+ *  CT  MR检查室二级分诊
  */
 <template>
 	<view class="content"  @longpress="open" @click="open">
@@ -29,7 +29,7 @@
 			</view>
 		</view>
 		<view class="footer">
-			<uni-notice-bar style="" scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true"  :showPlaySound="true"></popupSet>
 	</view>
@@ -170,7 +170,7 @@
 							datas.queueDtoList.forEach((data,index) =>{
 								if(data.name){
 									seeing = {
-										name: data.name?this.$util.hideName(data.name):'',
+										name: data.name || '',
 										number: data.queueNo || '',
 										nameNoHide:data.name,
 									}
@@ -178,7 +178,7 @@
 								let wating = [];
 								data.waitList.forEach(item => {
 									wating.push({
-										name: item.name?this.$util.hideName(item.name):'',
+										name: item.name || '',
 										number:item.queueNo || ''
 									})
 								})

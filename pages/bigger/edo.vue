@@ -1,36 +1,37 @@
 <template>
 	<view class="content"  @longpress="open" @click="open">
-		<image class="bg" src="../../static/triage_three.png" ></image>
+		<image class="bg" src="../../static/edo.png" ></image>
 		<view class="type">
-			<view class="type-text">检查室</view>
-			<view class="type-text">当前检查</view>
-			<view class="type-text">候诊</view>
-			<view class="type-text">已叫号</view>
+			<view class="title">{{title}}</view>
 		</view>
 		<view class="info">
+			<view class="info-patient" >
+				<view class="type-text">检查室</view>
+				<view class="type-text">当前检查</view>
+				<view style="flex: 1;text-align: center;">等待检查</view>
+			</view>
 			<view class="info-patient" v-for="(item,index) in data" :key="index">
 				<view class="room">
 					<view>{{item.room}}</view>
 				</view>
 				<view class="number room">
-					<view >
-						<text class="pr-15" v-if="item.seeingNumber">{{item.seeingNumber}}号</text>
+					<view>
+						<text class="pr-15"  v-if="item.seeingNumber">{{item.seeingNumber}}号</text>
 						<text class="pl-15">{{item.seeingName}}</text>
 					</view>
 				</view>
-				<view class="room">
-					<view>
-						<text class="pr-15"  v-if="item.waitingNumber">{{item.waitingNumber}}号</text>
+				<view class="room" v-for="(item,index) in item.waitingList" :key="index">
+					<view >
+						<text class="pr-15" v-if="item.queueNo">{{item.queueNo}}号</text>
+						<text class="pl-15">{{item.hideName}}</text>
+					</view>
+				</view>
+				<!-- <view class="room">
+					<view >
+						<text class="pr-15" v-if="item.waitingNumber">{{item.waitingNumber}}号</text>
 						<text class="pl-15">{{item.waitingName}}</text>
 					</view>
-				</view>
-				<view class="room">
-					<!-- <view v-if="item.pastName">
-     					</view> -->
-					<view class="uni-notice">
-						<uni-notice-bar scrollable="true" single="true" :fontSize="noticeFontSize" :text="item.pastName" color="#000"></uni-notice-bar>
-					</view>
-				</view>
+				</view> -->
 			</view>
 		</view>
 		<view class="footer">
@@ -47,14 +48,14 @@
 		components: { popupSet ,uniNoticeBar},
 		data() {
 			return {
-				title:'超声科',
+				title:'',
 				data:[
 					// {
 					// 	room:'检查室203',
 					// 	number:'GX124',
 					// 	department:'数字胃肠镜',
-					// 	seeingName:'吴先杰吴先杰吴先杰',
-					// 	seeingNumber:'321',
+					// 	seeingName:'吴先1杰吴',
+					// 	seeingNumber:'3211',
 					// 	waitingName:'吴先杰',
 					// 	waitingNumber:'321',
 					// 	pastName:'我先杰',
@@ -109,12 +110,7 @@
 			this.iType = dataInit.iType || '';
 			this.playSound = dataInit.playSound || false;
 			this.text = dataInit.text || '';
-			if(this.iType){
-				this.init();
-				this.dataPopup.iType = this.iType;
-				this.dataPopup.playSound = this.playSound;
-				this.dataPopup.text = this.text;
-			}
+			this.init();
 			uni.getSystemInfo({
 			    success: (res) =>{
 					if(res.windowWidth < 1600 ){
@@ -134,9 +130,7 @@
 			// 关闭设置
 			close(){
 				this.popupShow = false;
-				if(this.iType){
-					this.init();
-				}
+				this.init();
 			},
 			//确定设置
 			confirm(res) {
@@ -152,36 +146,10 @@
 					return false;
 				}
 				// 测试使用
-				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
-				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
-				// 	},
-				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
-				// 	},
-				// 	{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
-				// 	},{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
-				// 	},
+				let datas = {"scrolling": "欢迎光临","reload": "false","data": [{"queueName": "内镜检查室1","examNo": "1","queueNo": "E001","patientName": "张三1","rePlay": false,"waitingList": [{"queueName": "内镜检查室1","examNo": "1","queueNo": "E002","patientName": "张三2","rePlay": false},{"queueName": "内镜检查室1","examNo": "1","queueNo": "E003","patientName": "张三3","rePlay": false}]},{"queueName": "内镜检查室2","examNo": null,"queueNo": null,"patientName": null,"rePlay": null,"waitingList": [{"queueName": "内镜检查室2","examNo": "1","queueNo": "E004","patientName": "张三4","rePlay": false},{"queueName": "内镜检查室2","examNo": "1","queueNo": "E005","patientName": "张三5","rePlay": false}]},{"queueName": "内镜检查室3","examNo": null,"queueNo": null,"patientName": null,"rePlay": null,"waitingList": [{"queueName": "内镜检查室3","examNo": "1","queueNo": "E007","patientName": "张三7","rePlay": false}]},{"queueName": "内镜检查室4","examNo": null,"queueNo": null,"patientName": null,"rePlay": null,"waitingList": [{"queueName": "内镜检查室4","examNo": "1","queueNo": "E008","patientName": "张三8","rePlay": false},{"queueName": "内镜检查室4","examNo": "1","queueNo": "E009","patientName": "张三9","rePlay": false}]},{"queueName": "内镜检查室5","examNo": null,"queueNo": null,"patientName": null,"rePlay": null,"waitingList": [{"queueName": "内镜检查室5","examNo": "1","queueNo": "E010","patientName": "张三10","rePlay": false}]}],"serverTime": "2021-09-13 02:24:45","queueTitle": "服务器1111"}
 				
-				// 	]}
-					
 				this.$request({
-					url: 'Queue/GetQueueAndCompleteList',
-					data:{
-						examClass: this.iType,
-						queueName: this.text,
-						apmFlag: '',
-					},
+					url: 'Queue/getQueueForBiggerEdo',
 					method: 'POST',
 					success: datas => {
 						try{
@@ -193,37 +161,38 @@
 								})
 								return;
 							}
-							if(datas.queueDtoList.length>3){
-								datas.queueDtoList = datas.queueDtoList.slice(0,3);
+							if(datas.data.length>7){
+								datas.data = datas.data.slice(0,7);
 							}
+							this.title =  datas.queueTitle;
 							this.tips = datas.scrolling;
 							let dataMaps = [];
 							let voiceDataInit = [];
-							datas.queueDtoList.forEach((data,index) =>{
-								let seeingName =data.name?this.$util.hideName(data.name):'';
-								let waiting = [];
-								let waitingName = '';
-								if(data.waitList.length>0){
-									waiting = data.waitList[0];
-									waitingName =waiting.name?this.$util.hideName(waiting.name):'';
-								}
-								let calledNumbera = data.completeList.map(item => {
-									return item.name?this.$util.hideName(item.name):'';
+							datas.data.forEach((data,index) =>{
+								let seeingName =data.patientName?this.$util.hideName(data.patientName):'';
+								// let waiting = [];
+								// let waitingName = '';
+								// if(data.waitingList.length>0){
+								// 	waiting = data.waitingList[0];
+								// 	waitingName =waiting.patientName?this.$util.hideName(waiting.patientName):'';
+								// }
+								data.waitingList.forEach(item =>{
+									item.hideName = item.patientName?this.$util.hideName(item.patientName):'';
 								})
 								let dataMap = {
 									room:data.queueName,
 									seeingNumber:data.queueNo,
 									seeingName:seeingName,
 									department:data.examClass,
-									pastName:calledNumbera.join(),
-									waitingName:waitingName,
-									waitingNumber:waiting.queueNo,
+									// waitingName:waitingName,
+									// waitingNumber:waiting.queueNo,
+									waitingList: data.waitingList
 								}
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
 									number = number?number+'号':'';
-									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
+									let speakText = `请,${number},${data.patientName}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -308,7 +277,7 @@
 @media screen and (min-width: 900px) and (max-width: 1300px) {
 	.content{
 		.info-patient {
-			height: 169px;
+			height: 85px;
 			
 		}
 	}
@@ -336,6 +305,7 @@ page {
     height: 78px;
     line-height: 78px;
     padding: 0 10px;
+	margin-top: 5px;
 }
 .chooseBtn{
 	font-size: 30px;
@@ -361,13 +331,15 @@ page {
 }
 .type{
 	font-size: 70px;
-	display: flex;
 	padding-top: 116px;
 	font-weight: bold;
 	height: 122px;
 	line-height: 122px;
     padding-left: 10px;
 	padding-right: 10px;
+	.title{
+		text-align: center;
+	}
 }
 .type-text{
 	width: 471px;
@@ -403,14 +375,16 @@ page {
 .info-patient {
 	display: flex;
 	align-items: center;
-	height: 254px;
+	height: 129px;
 	text-align: center;
 }
 .info-patient view {
 	 font-size: 58px;
 	font-weight: bold;
 	color: #000;
+	white-space: nowrap;
 	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 </style>

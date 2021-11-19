@@ -1,9 +1,9 @@
 /**
- * 超声科 口腔 放射科
+ *  CT  MR检查室二级分诊
  */
 <template>
 	<view class="content"  @longpress="open" @click="open">
-		<image class="bg" src="../../static/triage_small_second.png" ></image>
+		<image class="bg" src="../../static/small_ctmr.png" ></image>
 		<view class="title">
 			<view class="title-dep">{{title}}</view>
 			<view class="title-room">{{text}}</view>
@@ -11,13 +11,13 @@
 		<view class="info">
 			<view class="info-patient">
 				<view class="data" >
-					<view >
-						<text class="pr-15" v-if="seeing.number">{{seeing.number?seeing.number+'号':''}}</text>
-						<text class="pl-15">{{seeing.name}}</text>
+					<view style="text-align: center;">
+						<view  v-if="seeing.number">{{seeing.number?seeing.number+'号':''}}</view>
+						<view >{{seeing.name}}</view>
 					</view>
 				</view>
 			</view>
-			<view class="info-patient pt-15">
+			<!-- <view class="info-patient pt-15">
 				<view class="room" >
 					<view v-for="(item,index) in data.wating" :key="index">
 						<view>
@@ -26,10 +26,10 @@
 						</view>
 					</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		<view class="footer">
-			<uni-notice-bar style="" scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" fontSize="30px" height="30px"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close" :dataInit="dataPopup" :showTitle="true" :showwText="true"  :showPlaySound="true"></popupSet>
 	</view>
@@ -98,21 +98,21 @@
 		},
 		methods: {
 			// 翻页
-			page(){
-				if(this.dataPage.length>this.pageNewNumber){
-					setTimeout(() => {
-						let data = this.dataPage.slice(this.pageNewNumber,++this.pageNewNumber)[0];
-						this.data = data;
-						this.page();
-					}, 6000);
-				}
-				else{
-					setTimeout(() => {
-						this.pageNewNumber = 1;
-						this.init();  
-					}, 6000);
-				}
-			},
+			// page(){
+			// 	if(this.dataPage.length>this.pageNewNumber){
+			// 		setTimeout(() => {
+			// 			let data = this.dataPage.slice(this.pageNewNumber,++this.pageNewNumber)[0];
+			// 			this.data = data;
+			// 			this.page();
+			// 		}, 6000);
+			// 	}
+			// 	else{
+			// 		setTimeout(() => {
+			// 			this.pageNewNumber = 1;
+			// 			this.init();  
+			// 		}, 6000);
+			// 	}
+			// },
 			// 打开设置
 			open(){
 				this.$refs.popupSet.open();
@@ -137,7 +137,7 @@
 				if(this.popupShow){
 					return false;
 				}
-				// 测试使用
+				console.log('init');
 				// let datas = { CompleteList:[{"queueNo": null,},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[
 				// 	{
 				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": '123',"name": "黎洋","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
@@ -149,7 +149,8 @@
 				// 	// },
 					
 				// 	],reload:"false"}
-				
+					
+					
 				this.$request({
 					url: 'Queue/GetQueue',
 					method: 'POST',
@@ -170,29 +171,12 @@
 							datas.queueDtoList.forEach((data,index) =>{
 								if(data.name){
 									seeing = {
-										name: data.name?this.$util.hideName(data.name):'',
+										name: data.name || '',
 										number: data.queueNo || '',
 										nameNoHide:data.name,
 									}
 								}
-								let wating = [];
-								data.waitList.forEach(item => {
-									wating.push({
-										name: item.name?this.$util.hideName(item.name):'',
-										number:item.queueNo || ''
-									})
-								})
-								wating = wating.length>2?wating.slice(0,2):wating;
-								let dataMap = {
-									room:data.queueName,
-									wating:wating,
-								}
-								if(wating.length>0){
-									dataMaps = dataMaps.concat(dataMap);
-								}
 							})
-							this.dataPage =  dataMaps;
-							let data = dataMaps[0] || [];
 							if(seeing.name){
 								this.seeing = seeing;
 								let number = this.$util.chineseNumeral(this.seeing.number+'');
@@ -210,10 +194,17 @@
 								}
 								if(this.voiceData.length>0){
 									this.voiceQueue();	
+								}else{
+									setTimeout(() => {
+										this.init();
+									}, this.interval);
 								}
 							}
-							this.data = data;
-							this.page();
+							else{
+								setTimeout(() => {
+									this.init();
+								}, this.interval);
+							}
 						}
 						catch(err){
 							console.error(err)
@@ -248,6 +239,8 @@
 					}
 					if(this.voiceData.length>0){
 						this.voiceQueue()
+					}else{
+						this.init();
 					}
 				}, 1900);
 			},
@@ -351,12 +344,12 @@ page {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 357px;
+	height: 723px;
 	text-align: center;
 	padding-left: 219px;
 }
 .info-patient view {
-	font-size: 60px;
+	font-size: 80px;
 	color: #fff;
 
 	text-overflow: ellipsis;

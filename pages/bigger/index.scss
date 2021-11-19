@@ -1,0 +1,39 @@
+@media screen and (min-width: 900px) and (max-width: 1300px) {
+	.content{
+		height: 720px;
+		width: 1280px !important;
+		overflow: hidden;
+		.footer{
+		    font-size: 34px;
+		    height: 52px;
+		    line-height: 52px;
+		}
+		.bg {
+			height: 720px;
+			width: 1280px;
+		}
+		.type{
+			font-size: 46.69px;
+			padding-top: 77.4px;
+			height: 81.4px;
+			line-height: 81.4px;
+			padding-left: 6px;
+		}
+		.type-text{
+		    width: 316.2px;
+		}
+		.info{
+			padding-left: 6px;
+			padding-right: 6px;
+			height: 508.3px;
+		}
+		.info-patient {
+			view{
+				font-size: 39px;
+			}
+			.room{
+				width: 317px;
+			}
+		}
+	}
+}

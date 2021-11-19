@@ -3,17 +3,17 @@
  */
 <template>
 	<view class="content"  @longpress="open" @click="open">
-		<image class="bg" src="../../static/noseThroat_small.png" ></image>
+		<image class="bg" src="../../static/nosethroatOld.png" ></image>
 		<view class="title">
 			<view class="title-room">{{title}}</view>
 		</view>
 		<view class="info">
-			<view class="info-patient ">
-				<view class="info-title">
+			<view class="info-patient wait">
+				<view class="info-title wait-title">
 					当前检查
 				</view>
-				<view class="room data">
-					<view v-for="(item,index) in data.seeing" :key="index" class="room-list" >
+				<view class="room ">
+					<view v-for="(item,index) in data.seeing" :key="index" class="room-list" style="color:rgb(113,17,18);">
 						<view>
 							<text class="pl-15">{{item.number}}</text>
 							<text class="pl-15">{{item.name}}</text>
@@ -23,7 +23,7 @@
 			</view>
 			<view class="info-patient pt-15 wait">
 				<view class="wait-title">
-					已叫号码
+					等待检查
 				</view>
 				<view class="room" >
 					<view v-for="(item,index) in data.wating" :key="index" class="room-list" >
@@ -141,18 +141,10 @@
 				if(this.popupShow){
 					return false;
 				}
-				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],
-				// 	scrolling:`1：请在自助机刷卡取号
-				// 	2:取号1后在大厅等候广播呼叫
-				// 	3:过号请与窗口联系！`,
-				// 	"queueDtoList":{
-				// 		"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
-				// 		"waitingList":[{"queueNo": 'C001',"name": "黎洋等",},{"queueNo": "","name": "黎洋等",},{"queueNo": 'C001',"name": "黎洋等",},{"queueNo": "","name": "黎洋等",},{"queueNo": "","name": "黎洋等",},{"queueNo": "","name": "黎洋等",},{"queueNo": "","name": "黎洋等",} ],
-				// 		"callingList":[{"queueNo": 'C0011',"name": "黎洋1",}],
-				// 	},}
+				// let datas = {"scrolling": "欢迎光临","reload": "false","serverTime": "2021-05-25 02:53:47","Doctor": {"doctorId": "1","doctorName": "张三","doctorTitle": null,"doctorPictureURL": "asdsadsad","doctorEquipmentId": "29"},"queueDtoList": {"callingList": [{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1A01","patientSource": null,"reqDept": null,"performDept": null,"name": "蜘蛛侠","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:48","waitStatus": "2"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1A02","patientSource": null,"reqDept": null,"performDept": null,"name": "赵四","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:49","waitStatus": "2"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1A03","patientSource": null,"reqDept": null,"performDept": null,"name": "王富贵","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:50","waitStatus": "2"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1A04","patientSource": null,"reqDept": null,"performDept": null,"name": "孙笑川","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:51","waitStatus": "2"}],"waitingList": [{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1B01","patientSource": null,"reqDept": null,"performDept": null,"name": "赵5啊","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:52","waitStatus": "0"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1B02","patientSource": null,"reqDept": null,"performDept": null,"name": "赵6请求","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:53","waitStatus": "0"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1B03","patientSource": null,"reqDept": null,"performDept": null,"name": "赵7方法","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:54","waitStatus": "0"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1B04","patientSource": null,"reqDept": null,"performDept": null,"name": "赵8搜索","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:55","waitStatus": "0"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1B05","patientSource": null,"reqDept": null,"performDept": null,"name": "赵9回合","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:56","waitStatus": "0"},{"examClass": "鼻咽喉镜","examSubClass": null,"examGroup": null,"queueName": "电子鼻咽喉镜","queueApm": null,"patLocalId": null,"queueNo": "1C01","patientSource": null,"reqDept": null,"performDept": null,"name": "赵10","age": null,"sex": null,"deferFlag": null,"callCount": null,"callTime": null,"scheduleTime": "2021-05-25 09:54:57","waitStatus": "0"}]}}
 				
 				this.$request({
-					url: 'Queue/GetQueueForENT',
+					url: 'Queue/GetQueueForOralCavity',
 					data:{
 						examClass: this.iType,
 						queueName: this.text,
@@ -300,7 +292,7 @@
 		.info-patient{
 			height: 327px;
 			&.wait{
-				height: 610px;
+				height: 550px;
 				.room{
 					font-size: 66px;
 					// padding: 50px 0 50px 20px;
@@ -314,7 +306,6 @@
 			}
 			.info-title{
 				font-size: 106px;
-				width: 329px;
 			}
 			.data{
 				.room-list{
@@ -324,15 +315,15 @@
 			}
 		}
 		.footer{
-			height: 458px;
+			height: 304px;
 			.footer-title{
 				width: 55px;
-				font-size: 70px;
+				font-size: 57px;
 				padding: 0 53px;
 			}
 			.footer-text{
-				font-size: 76px;
-				
+				font-size: 51px;
+				width: 846px;
 			}
 		}
 	}
@@ -393,12 +384,12 @@ page {
 	color: #000;
     font-size: 41px;
 	display: flex;
-	padding: 5px 15px;
-	height: 322px;
+	padding: 5px 19px;
+	height: 211px;
 }
 .footer-title{
-	 width: 44px;
-	 font-size: 53px;
+	 width: 50px;
+	 font-size: 40px;
 	 padding: 0 29px;
 	line-height: 1.1;
 	height: 100%;
@@ -413,10 +404,10 @@ page {
 	justify-content: center;
 	padding-left: 30px;
 	overflow: hidden;
-	width: 840px;
+	width: 600px;
 	line-height: 1.3;
 	color: rgb(113,17,18);
-	font-size: 57px;
+	font-size: 35px;
 }
 
 .chooseBtn{
@@ -479,8 +470,6 @@ page {
 .info-patient .info-title{
 	color: rgb(113,17,18);
 	font-size: 80px;
-	padding: 0 12px 10px 12px;
-	width: 320px;
 }
 .info-patient:first-child{
 	padding-top: 10px;
@@ -495,7 +484,6 @@ page {
 	display: flex;
 	flex-wrap: wrap;
 	padding-right: 13px;
-	padding-top: 15px;
 }
 
 .wait .room .room-list{
@@ -521,7 +509,7 @@ page {
 }
 .info-patient.wait{
 	align-items: flex-start;
-	height: 435px;
+	height: 386px;
 }
 .wait-title{
 	height: 100%;

@@ -1,6 +1,6 @@
 <template>
 	<view class="content"  @longpress="open" @click="open">
-		<image class="bg" src="../../static/triage_five.png" ></image>
+		<image class="bg" src="../../static/triage_six.png" ></image>
 		<view class="type">
 			<view class="type-text">检查室</view>
 			<view class="type-text">当前检查</view>
@@ -13,8 +13,8 @@
 					<view>{{item.room}}</view>
 				</view>
 				<view class="number room">
-					<view v-if="item.seeingNumber">
-						<text class="pr-15">{{item.seeingNumber}}号</text>
+					<view >
+						<text class="pr-15" v-if="item.seeingNumber">{{item.seeingNumber}}号</text>
 						<text class="pl-15">{{item.seeingName}}</text>
 					</view>
 				</view>
@@ -29,13 +29,13 @@
 						<text class="pl-15">{{item.pastName}}</text>
 					</view> -->
 					<view class="uni-notice">
-						<uni-notice-bar scrollable="true" single="true" :text="item.pastName" color="#000"></uni-notice-bar>
+						<uni-notice-bar scrollable="true" single="true" :fontSize="noticeFontSize"  :text="item.pastName" color="#000"></uni-notice-bar>
 					</view>
 				</view>
 			</view>
 		</view>
 		<view class="footer">
-			<uni-notice-bar scrollable="true" single="true" :text="tips"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :fontSize="noticeFontSize" :height="noticeFontSize" :text="tips"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close" backgroundColor="transparent" :showwText="true" :dataInit="dataPopup" color="#fff" :showPlaySound="true" :showIType="true" ></popupSet>
 	</view>
@@ -101,6 +101,7 @@
 				voicePlayTiems:0,
 				tips:'',
 				interval:10000,
+				noticeFontSize:''
 			}
 		},
 		onLoad() {
@@ -115,6 +116,15 @@
 				this.dataPopup.playSound = this.playSound;
 				this.dataPopup.text = this.text;
 			}
+			uni.getSystemInfo({
+			    success: (res) =>{
+					if(res.windowWidth < 1600 ){
+						this.noticeFontSize = '30px'
+					}else{
+						this.noticeFontSize = '44px'
+					}
+			    }
+			});
 		},
 		methods: {
 			// 打开设置
@@ -147,20 +157,34 @@
 				// 	{
 				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
 				// 	},
 				// 	{
 				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
 				// 	},
 				// 	{
 				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
-				// 	"completeList":[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}]
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
+				// 	},{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
+				// 	},
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
+				// 	},
+				// 	{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT843","name": "黎洋2","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// 	"waitList":[{"queueNo": "CT843","name": "黎洋等",}],
+				// 	"completeList":[{"name": "黎洋等",},{"name": "黎洋等",}]
 				// 	},
 				// 	]}
-				
+					
 				this.$request({
 					url: 'Queue/GetQueueAndCompleteList',
 					data:{
@@ -179,8 +203,8 @@
 								})
 								return;
 							}
-							if(datas.queueDtoList.length>5){
-								datas.queueDtoList = datas.queueDtoList.slice(0,5);
+							if(datas.queueDtoList.length>6){
+								datas.queueDtoList = datas.queueDtoList.slice(0,6);
 							}
 							this.tips = datas.scrolling;
 							let dataMaps = [];
@@ -194,7 +218,7 @@
 									waitingName =waiting.name?this.$util.hideName(waiting.name):'';
 								}
 								let calledNumbera = data.completeList.map(item => {
-									return item.queueNo;
+									return item.name?this.$util.hideName(item.name):'';
 								})
 								let dataMap = {
 									room:data.queueName,
@@ -208,7 +232,8 @@
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
-									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									number = number?number+'号':'';
+									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -288,7 +313,16 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+@import './index.scss';
+@media screen and (min-width: 900px) and (max-width: 1300px) {
+	.content{
+		.info-patient {
+			height: 85px;
+			
+		}
+	}
+}
 .pr-15{
 	padding-right: 15px;
 }
@@ -338,7 +372,7 @@ page {
 .type{
 	font-size: 70px;
 	display: flex;
-	padding-top: 116px;
+	padding-top: 117px;
 	font-weight: bold;
 	height: 122px;
 	line-height: 122px;
@@ -378,13 +412,12 @@ page {
 
 .info-patient {
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	height: 153px;
+	height: 127px;
 	text-align: center;
 }
 .info-patient view {
-	 font-size: 58px;
+	 font-size: 56px;
 	font-weight: bold;
 	color: #000;
 	overflow: hidden;

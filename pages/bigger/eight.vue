@@ -26,13 +26,13 @@
 				</view>
 				<view class="room">
 					<view class="uni-notice">
-						<uni-notice-bar scrollable="true" single="true" :text="item.pastName" color="#000"></uni-notice-bar>
+						<uni-notice-bar scrollable="true" single="true" :fontSize="noticeFontSize" :text="item.pastName" color="#000"></uni-notice-bar>
 					</view>
 				</view>
 			</view>
 		</view>
 		<view class="footer">
-			<uni-notice-bar scrollable="true" single="true" :text="tips"></uni-notice-bar>
+			<uni-notice-bar scrollable="true" single="true" :text="tips" :fontSize="noticeFontSize" :height="noticeFontSize"></uni-notice-bar>
 		</view>
 		<popupSet ref="popupSet" @confirm="confirm" @close="close" backgroundColor="transparent" :showwText="true" :dataInit="dataPopup" color="#fff" :showPlaySound="true" :showIType="true" ></popupSet>
 	</view>
@@ -78,6 +78,7 @@
 				voicePlayTiems:3,
 				tips:'',
 				interval:10000,
+				noticeFontSize:''
 			}
 		},
 		onLoad() {
@@ -92,6 +93,15 @@
 				this.dataPopup.playSound = this.playSound;
 				this.dataPopup.text = this.text;
 			}
+			uni.getSystemInfo({
+			    success: (res) =>{
+					if(res.windowWidth < 1600 ){
+						this.noticeFontSize = '30px'
+					}else{
+						this.noticeFontSize = '44px'
+					}
+			    }
+			});
 		},
 		methods: {
 			// 打开设置
@@ -186,7 +196,8 @@
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
-									let speakText = `请,${number}号,${data.name}到,${dataMap.room}就诊`;
+									number = number?number+'号':'';
+									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -266,7 +277,16 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+@import './index.scss';
+@media screen and (min-width: 900px) and (max-width: 1300px) {
+	.content{
+		.info-patient {
+			height: 63px;
+			
+		}
+	}
+}
 .pr-15{
 	padding-right: 15px;
 }
@@ -356,7 +376,6 @@ page {
 
 .info-patient {
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	height: 95px;
 	text-align: center;
