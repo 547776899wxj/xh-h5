@@ -1,33 +1,35 @@
 <template>
 	<view class="content"  @longpress="open" @click="open">
-		<image class="bg" src="../../static/ultrasonic.png" ></image>
+		<image class="bg" src="../../static/ultrNew.png" ></image>
 		<view class="title">{{title}}</view>
-		<view class="tip">温馨提示：各个诊室正在呼叫号码如下：</view>
 		<view class="info">
 			<view>
-				<view class="info-patient" v-for="(item,index) in data.slice(0,5)" :key="index">
-					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+				<view class="info-patient">
+					<view class="number">检查室</view>
+					<view class="number">正在检查</view>
+					<view class="number">已过号</view>
+				</view>
+				<view class="info-patient" v-for="(item,index) in data.slice(0,8)" :key="index">
+					<view class="number">{{item.room}}</view>
+					<view class="number " :class="{seeing:item.seeingLength>9}">{{item.number}}{{item.seeingName}}</view>
+					<view class="number">
+						<uni-notice-bar scrollable="true" single="true" color='#000' :text="item.calledNumbera" :fontSize="noticeFontSize" :speed='30'></uni-notice-bar>
+					</view>
 				</view>
 			</view>
 			<view>
-				<view class="info-patient" v-for="(item,index) in data.slice(5,10)" :key="index">
-					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+				<view class="info-patient">
+					<view class="number">检查室</view>
+					<view class="number">正在检查</view>
+					<view class="number">已过号</view>
 				</view>
-			</view>
-			<view>
-				<view class="info-patient" v-for="(item,index) in data.slice(10,15)" :key="index">
-					<view class="room">{{item.room}}</view>
-					<view class="number">{{item.number}}</view>
+				<view class="info-patient" v-for="(item,index) in data.slice(8,17)" :key="index">
+					<view class="number">{{item.room}}</view>
+					<view class="number " :class="{seeing:item.seeingLength>9}">{{item.number}}{{item.seeingName}}</view>
+					<view class="number">
+						<uni-notice-bar scrollable="true" single="true" color='#000' :text="item.calledNumbera" :fontSize="noticeFontSize" :speed='30'></uni-notice-bar>
+					</view>
 				</view>
-			</view>
-		</view>
-		<view class=" info-patient">
-			<view class="room">已叫号码</view>
-			<!-- <view class="number">{{calledNumbera}}</view> -->
-			<view class="uni-notice">
-				<uni-notice-bar scrollable="true" single="true" :text="calledNumbera" color="#000" :fontSize="noticeFontSize" ></uni-notice-bar>
 			</view>
 		</view>
 		<view class="footer">
@@ -77,8 +79,8 @@
 			this.playSound = dataInit.playSound || false;
 			this.text = dataInit.text || '';
 			this.title = dataInit.title || '';
+			this.init();
 			if(this.iType){
-				this.init();
 				this.dataPopup.iType = this.iType;
 				this.dataPopup.playSound = this.playSound ;
 				this.dataPopup.text = this.text;
@@ -120,19 +122,20 @@
 					return false;
 				}
 				// 测试使用
-				// let datas = { CompleteList:[{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",},{"queueNo": "CT1518843",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[{
-				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
+				// let datas = { CompleteList:[{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",},{"queueNo": "CT151",}],scrolling:'友情提示：请在自助机刷卡取排队号，取号1后在大厅等候广播呼叫，过号请与窗口联系！',"queueDtoList":[{
+				// 	"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",
 				// 	},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
-				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT1518843","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
+				// 	{"waitStatus": "4","examClass": "CT","sex": "男","patientSource": "住院","queueNo": "CT151","name": "黎洋麟","reqDept": "1243","scheduleTime": "2020-12-11 10:49:00","examGroup": "CT40","performDept": "1307","callCount": "1","callTime": "2020-12-11 10:33:21","queueApm": "全天","queueName": "CT2","age": "19岁","deferFlag": "0",},
 					
 				// 	]}
+				
 				this.$request({
-					url: 'Queue/getQueueForUsBig',
+					url: 'Queue/getQueue/Us/Big',
 					data:{
 						examClass: this.iType,
 						queueName: this.text,
@@ -149,29 +152,34 @@
 								})
 								return;
 							}
-							let calledNumbera = datas.CompleteList.map(item => {
-								return item.queueNo;
-							})
-							this.calledNumbera = calledNumbera.join();
+						
 							this.tips = datas.scrolling;
 							let dataMaps = [];
 							let voiceDataInit = [];
 							datas.queueDtoList.forEach((data,index) =>{
-								if(!data.queueNo && this.data[index]){
-									data.queueNo = this.data[index].number;
-									data.name = this.data[index].seeingName;
+								// if(!data.queueNo && this.data[index]){
+								// 	data.queueNo = this.data[index].number;
+								// 	data.patientName = this.data[index].seeingName;
+								// }
+								let seeingName =data.patientName?this.$util.hideName(data.patientName):'';
+								let calledNumbera = [];
+								if(Array.isArray(data.passList)){
+									calledNumbera = data.passList.map(item => {
+										return item.queueNo;
+									})
 								}
-								let seeingName =data.name?this.$util.hideName(data.name):'';
 								let dataMap = {
 									room:data.queueName,
-									number:data.queueNo || '',
+									number:data.queueNo  || '',
 									seeingName:seeingName,
+									calledNumbera: calledNumbera.join(),
+									seeingLength:(data.queueNo+'').length + seeingName.length
 								}
 								dataMaps = dataMaps.concat(dataMap);
 								if(seeingName && this.playSound){
 									let number = this.$util.chineseNumeral(dataMap.seeingNumber+'');
 									number = number?number+'号':'';
-									let speakText = `请,${number}${data.name}到,${dataMap.room}就诊`;
+									let speakText = `请,${number}${data.patientName}到,${dataMap.room}就诊`;
 									if(this.data.length==0){
 										this.voiceData.push(speakText);
 										this.voiceDataInit.push(speakText);
@@ -200,10 +208,10 @@
 							}
 						}
 						catch(err){
-							console.error(e);
 							setTimeout(() => {
 								this.init();
 							}, this.interval);
+							console.error(err);
 						}
 					},
 					fail: err => {
@@ -296,9 +304,10 @@ page {
 .info-patient .number{
 	width: 318px;
 	font-size: 45px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	text-align: center;
+}
+.info-patient .number.seeing{
+	font-size: 24px !important;
 }
 .uni-notice{
 	padding-left: 20px;
@@ -347,16 +356,13 @@ page {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 .title{
 	font-weight: bold;
     padding-top: 115px;
     font-size: 80px;
     text-align: center;
-    height: 120px;
+    height: 66px;
     line-height: 120px;
 }
 .tip{
@@ -374,8 +380,8 @@ page {
 			width: 1280px;
 		}
 		.title{
-			height: 80px;
-			line-height: 80px;
+			height: 66px;
+			line-height: 66px;
 			font-size: 54px;
 			padding-top: 76.7px;
 		}
@@ -386,7 +392,7 @@ page {
 			padding-left: 36px;
 		}
 		.info{
-			height: 363.3px;
+			height: 525.3px;
 		}
 		.uni-notice{
 			padding-left: 13px;
@@ -399,7 +405,7 @@ page {
 		    padding: 0 10px;
 		}
 		.info-patient{
-			height: 72.7px;
+			height: 58.7px;
 			view{
 				font-size: 36.7px;
 			}

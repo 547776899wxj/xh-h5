@@ -4,7 +4,7 @@ export default class Http{
 		// let ip = '/api/';
 		// 医院ip
 		let ip = 'http://192.168.2.18:8081/';
-		 // ip = 'http://192.168.0.152:8081/'; 
+		 // ip = 'http://192.168.0.103:8081/'; 
 		// 参数
 		this.options = options;
 		// 请求参数
